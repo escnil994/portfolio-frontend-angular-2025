@@ -1,0 +1,355 @@
+<!-- admin-project-form.component.html - VERSIÓN COMPLETA -->
+
+<!-- Hero Section -->
+<section class="hero-section relative py-16 overflow-hidden">
+  <div class="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5"></div>
+  <div class="absolute top-10 right-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse-slow"></div>
+  <div class="absolute bottom-10 left-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse-slow"
+    style="animation-delay: 2s;"></div>
+
+  <div class="container mx-auto px-4 relative z-10 text-center">
+    <div animateOnScroll>
+      <span class="text-accent text-lg font-semibold mb-2 block">
+        {{ isEditMode() ? 'Administration' : 'New Project' }}
+      </span>
+      <h1 class="text-5xl md:text-6xl font-bold mb-4">
+        <span
+          class="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient">
+          {{ isEditMode() ? 'Edit Project' : 'Create Project' }}
+        </span>
+      </h1>
+      <p class="text-xl text-base-content/70 max-w-2xl mx-auto">
+        {{ isEditMode() ? 'Update project details and manage your gallery.' : 'Fill in the information for a new project and upload images.' }}
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Loading State -->
+@if (loading()) {
+  <section class="section-padding">
+    <div class="container mx-auto px-4 max-w-5xl">
+      <div class="flex justify-center items-center min-h-[400px]">
+        <div class="text-center">
+          <span class="loading loading-spinner loading-lg text-primary"></span>
+          <p class="text-base-content/60 mt-4">Loading project data...</p>
+        </div>
+      </div>
+    </div>
+  </section>
+}
+
+<!-- Form Section -->
+@if (!loading()) {
+  <section class="section-padding">
+    <div class="container mx-auto px-4 max-w-5xl">
+      <form [formGroup]="projectForm" (ngSubmit)="onSubmit()">
+
+        <!-- Project Details Card -->
+        <div class="project-card" animateOnScroll>
+          <div class="flex items-center gap-3 mb-6">
+            <div class="icon-wrapper">
+              <span class="material-icons text-3xl text-primary">info</span>
+            </div>
+            <h2 class="text-3xl font-bold">Project Details</h2>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Title -->
+            <div class="form-group md:col-span-2">
+              <label class="form-label">
+                <span class="material-icons text-sm">title</span>
+                Project Title *
+              </label>
+              <input
+                type="text"
+                formControlName="title"
+                class="form-input"
+                [class.input-error]="getFieldError('title')"
+                placeholder="My Amazing Personal Project">
+              @if (getFieldError('title')) {
+                <span class="error-message">{{ getFieldError('title') }}</span>
+              }
+            </div>
+
+            <!-- Technologies -->
+            <div class="form-group md:col-span-2">
+              <label class="form-label">
+                <span class="material-icons text-sm">code</span>
+                Technologies *
+              </label>
+              <div class="tags-input-wrapper"
+                   [class.has-error]="getFieldError('technologies')"
+                   (click)="focusTechInput()">
+                @for (tech of technologies(); track tech) {
+                  <div class="tag-item">
+                    <span class="tag-text">{{ tech }}</span>
+                    <button type="button"
+                            class="tag-remove"
+                            (click)="removeTechnology(tech)"
+                            [attr.aria-label]="'Remove ' + tech">
+                      <span class="material-icons">close</span>
+                    </button>
+                  </div>
+                }
+                <input
+                  #techInput
+                  type="text"
+                  class="tag-input"
+                  [value]="techInputValue()"
+                  (input)="onTechInput($event)"
+                  (keydown)="onTechKeydown($event)"
+                  placeholder="Type and press Enter">
+              </div>
+              <span class="tags-hint">Press Enter to add each technology</span>
+              @if (getFieldError('technologies')) {
+                <span class="error-message">{{ getFieldError('technologies') }}</span>
+              }
+            </div>
+
+            <!-- Description -->
+            <div class="form-group md:col-span-2">
+              <label class="form-label">
+                <span class="material-icons text-sm">description</span>
+                Detailed Description *
+              </label>
+              <textarea
+                formControlName="description"
+                rows="6"
+                class="form-input"
+                [class.input-error]="getFieldError('description')"
+                placeholder="Describe the project, its goals, tech stack and key features..."></textarea>
+              @if (getFieldError('description')) {
+                <span class="error-message">{{ getFieldError('description') }}</span>
+              }
+            </div>
+
+            <!-- Tags -->
+            <div class="form-group md:col-span-2">
+              <label class="form-label">
+                <span class="material-icons text-sm">label</span>
+                Tags
+                <span class="text-sm text-base-content/60 font-normal ml-auto">Optional</span>
+              </label>
+              <div class="tags-input-wrapper" (click)="focusTagInput()">
+                @for (tag of tags(); track tag) {
+                  <div class="tag-item">
+                    <span class="tag-text">{{ tag }}</span>
+                    <button type="button"
+                            class="tag-remove"
+                            (click)="removeTag(tag)"
+                            [attr.aria-label]="'Remove ' + tag">
+                      <span class="material-icons">close</span>
+                    </button>
+                  </div>
+                }
+                <input
+                  #tagInput
+                  type="text"
+                  class="tag-input"
+                  [value]="tagInputValue()"
+                  (input)="onTagInput($event)"
+                  (keydown)="onTagKeydown($event)"
+                  placeholder="Type and press Enter">
+              </div>
+              <span class="tags-hint">Press Enter to add each tag</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Project Links Card -->
+        <div class="project-card" animateOnScroll [style.animation-delay.ms]="100">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="icon-wrapper">
+              <span class="material-icons text-3xl text-accent">link</span>
+            </div>
+            <h2 class="text-3xl font-bold">Project Links</h2>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- GitHub URL -->
+            <div class="form-group">
+              <label class="form-label">
+                <span class="material-icons text-sm">code</span>
+                GitHub URL
+              </label>
+              <input
+                type="url"
+                formControlName="github_url"
+                class="form-input"
+                placeholder="https://github.com/username/project">
+            </div>
+
+            <!-- Live Demo URL -->
+            <div class="form-group">
+              <label class="form-label">
+                <span class="material-icons text-sm">language</span>
+                Live Demo URL
+              </label>
+              <input
+                type="url"
+                formControlName="demo_url"
+                class="form-input"
+                placeholder="https://your-project.vercel.app">
+            </div>
+
+            <!-- Video URL -->
+            <div class="form-group md:col-span-2">
+              <label class="form-label">
+                <span class="material-icons text-sm">play_circle</span>
+                Video URL
+              </label>
+              <input
+                type="url"
+                formControlName="video_url"
+                class="form-input"
+                placeholder="https://www.youtube.com/watch?v=...">
+              <span class="tags-hint">Add a YouTube video demo (optional)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Image Gallery Card -->
+        <div class="project-card" animateOnScroll [style.animation-delay.ms]="200">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="icon-wrapper">
+              <span class="material-icons text-3xl text-info">collections</span>
+            </div>
+            <div class="flex-1">
+              <h2 class="text-3xl font-bold">Image Gallery</h2>
+              <p class="text-base-content/70 text-sm mt-1">
+                Upload up to 5 images. The first image will be the main one.
+              </p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            @for (slot of imageSlots(); track $index) {
+              <div class="image-upload-slot" [class.has-image]="slot.preview">
+                @if (slot.preview) {
+                  <!-- Image Preview -->
+                  <div class="image-preview-wrapper">
+                    <img [src]="slot.preview" alt="Preview" class="image-preview">
+                    <div class="image-overlay">
+                      <button
+                        type="button"
+                        class="image-action-btn delete-btn"
+                        (click)="removeImage($index)">
+                        <span class="material-icons">delete</span>
+                      </button>
+                    </div>
+                    @if ($index === 0) {
+                      <div class="primary-badge">
+                        <span class="material-icons text-xs">star</span>
+                        Main
+                      </div>
+                    }
+                  </div>
+                } @else {
+                  <!-- Upload Button -->
+                  <label class="image-upload-label">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      (change)="onImageSelected($event, $index)"
+                      class="hidden">
+                    <div class="upload-content">
+                      <span class="material-icons text-4xl text-base-content/40 mb-2">add_photo_alternate</span>
+                      <p class="text-xs text-base-content/60 text-center">
+                        @if ($index === 0) {
+                          Main Image
+                        } @else {
+                          Add Image
+                        }
+                      </p>
+                    </div>
+                  </label>
+                }
+              </div>
+            }
+          </div>
+
+          @if (imageError()) {
+            <div class="alert alert-error mt-4">
+              <span class="material-icons">error</span>
+              <span>{{ imageError() }}</span>
+            </div>
+          }
+        </div>
+
+        <!-- Project Options Card -->
+        <div class="project-card" animateOnScroll [style.animation-delay.ms]="300">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="icon-wrapper">
+              <span class="material-icons text-3xl text-warning">settings</span>
+            </div>
+            <h2 class="text-3xl font-bold">Project Options</h2>
+          </div>
+
+          <div class="featured-toggle">
+            <label class="toggle-label">
+              <input
+                type="checkbox"
+                formControlName="featured"
+                class="toggle-input">
+              <span class="toggle-slider"></span>
+            </label>
+            <div class="toggle-content">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="material-icons text-warning">star</span>
+                <span class="font-semibold">Mark as Featured Project</span>
+              </div>
+              <p class="text-base-content/70 text-sm">
+                Featured projects appear on the home page and have higher visibility.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Success Message -->
+        @if (submitSuccess()) {
+          <div class="alert alert-success" animateOnScroll>
+            <span class="material-icons">check_circle</span>
+            <div>
+              <p class="font-semibold">
+                {{ isEditMode() ? 'Project updated successfully!' : 'Project created successfully!' }}
+              </p>
+              <p class="text-sm">The project has been saved correctly.</p>
+            </div>
+          </div>
+        }
+
+        <!-- Error Message -->
+        @if (submitError()) {
+          <div class="alert alert-error" animateOnScroll>
+            <span class="material-icons">error</span>
+            <span>{{ submitError() }}</span>
+          </div>
+        }
+
+        <!-- Form Actions -->
+        <div class="form-actions" animateOnScroll [style.animation-delay.ms]="400">
+          <button
+            type="button"
+            (click)="goBack()"
+            class="cancel-btn">
+            <span class="material-icons mr-2">arrow_back</span>
+            Cancel
+          </button>
+          <button
+            type="submit"
+            [disabled]="projectForm.invalid || submitting()"
+            class="submit-btn">
+            @if (submitting()) {
+              <span class="loading loading-spinner loading-sm"></span>
+              Saving...
+            } @else {
+              <span class="material-icons mr-2">{{ isEditMode() ? 'save' : 'add' }}</span>
+              {{ isEditMode() ? 'Save Changes' : 'Create Project' }}
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </section>
+}

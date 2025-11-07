@@ -1,0 +1,10 @@
+.logo-wrapper {
+  font-family: "Fira Code", "Courier New", Courier, monospace;
+  font-size: 1.5rem; /* 24px */
+  font-weight: 700;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  transition: all 0.3s ease-in-out;
+}

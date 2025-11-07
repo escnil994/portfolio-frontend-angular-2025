@@ -1,0 +1,143 @@
+<section class="hero-section relative min-h-screen flex items-center justify-center overflow-hidden">
+  <!-- Background Effects -->
+  <div class="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5"></div>
+  <div class="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse-slow"></div>
+  <div class="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse-slow"
+    style="animation-delay: 2s;"></div>
+
+  <div class="container mx-auto px-4 relative z-10">
+    <div class="max-w-md mx-auto">
+      <!-- Header -->
+      <div class="text-center mb-8 animate-fade-in">
+        <div class="mb-6">
+          <div
+            class="w-20 h-20 mx-auto bg-gradient-to-br from-primary to-accent rounded-2xl flex items-center justify-center shadow-lg shadow-primary/20 animate-bounce-slow">
+            <span class="material-icons text-4xl text-white">verified_user</span>
+          </div>
+        </div>
+        <h1 class="text-4xl md:text-5xl font-bold mb-3">
+          <span class="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+            Verify Your Identity
+          </span>
+        </h1>
+        <p class="text-base-content/70 text-lg">Enter the 6-digit code sent to your email</p>
+      </div>
+
+      <!-- Verify Form Card -->
+      <div class="card bg-base-100 shadow-2xl border border-base-300 animate-slide-up">
+        <div class="card-body p-8">
+          <form [formGroup]="verifyForm" (ngSubmit)="onSubmit()" class="space-y-6">
+            <!-- Error Message -->
+            @if (errorMessage()) {
+            <div class="alert alert-error shadow-lg animate-shake">
+              <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>{{ errorMessage() }}</span>
+            </div>
+            }
+
+            <!-- Success Message -->
+            @if (successMessage()) {
+            <div class="alert alert-success shadow-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>{{ successMessage() }}</span>
+            </div>
+            }
+
+            <!-- Code Input -->
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text font-semibold text-center w-full">Verification Code</span>
+              </label>
+              <div class="relative">
+                <input type="text" formControlName="code" maxlength="6" inputmode="numeric"
+                  placeholder="000000"
+                  class="input input-bordered w-full text-center text-3xl tracking-[1rem] font-mono focus:input-primary transition-all"
+                  [class.input-error]="verifyForm.get('code')?.invalid && verifyForm.get('code')?.touched"
+                  (input)="onCodeInput($event)"
+                  autocomplete="one-time-code" />
+              </div>
+              @if (verifyForm.get('code')?.invalid && verifyForm.get('code')?.touched) {
+              <label class="label">
+                <span class="label-text-alt text-error text-center w-full">6-digit code is required</span>
+              </label>
+              }
+              <label class="label">
+                <span class="label-text-alt text-base-content/50 text-center w-full">
+                  Code expires in 10 minutes
+                </span>
+              </label>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" [disabled]="verifyForm.invalid || authService.loading()"
+              class="btn btn-primary w-full gap-2 shadow-lg hover:shadow-xl transition-all group">
+              @if (authService.loading()) {
+              <span class="loading loading-spinner"></span>
+              Verifying...
+              } @else {
+              <span class="material-icons">check_circle</span>
+              Verify Code
+              <span class="material-icons group-hover:scale-110 transition-transform">arrow_forward</span>
+              }
+            </button>
+
+            <!-- Resend Code -->
+            <div class="text-center pt-2">
+              <p class="text-sm text-base-content/60 mb-2">
+                Didn't receive the code?
+              </p>
+              <button type="button" (click)="resendCode()" [disabled]="resendTimer() > 0"
+                class="btn btn-ghost btn-sm gap-2">
+                @if (resendTimer() > 0) {
+                <span class="material-icons text-base">schedule</span>
+                Resend in {{ resendTimer() }}s
+                } @else {
+                <span class="material-icons text-base">refresh</span>
+                Resend Code
+                }
+              </button>
+            </div>
+
+            <!-- Back to Login -->
+            <div class="text-center pt-2">
+              <a routerLink="/login" class="link link-hover text-primary gap-1 inline-flex items-center group">
+                <span class="material-icons text-sm group-hover:-translate-x-1 transition-transform">arrow_back</span>
+                Back to Login
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Security Info -->
+      <div class="mt-6 animate-fade-in" style="animation-delay: 0.3s;">
+        <div class="card bg-base-100/50 backdrop-blur-sm border border-base-300">
+          <div class="card-body p-4">
+            <div class="flex items-center gap-3">
+              <div class="bg-success/10 p-2 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-success" viewBox="0 0 20 20"
+                  fill="currentColor">
+                  <path fill-rule="evenodd"
+                    d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clip-rule="evenodd" />
+                </svg>
+              </div>
+              <div class="flex-1">
+                <h4 class="font-semibold text-sm">Secure 2FA Authentication</h4>
+                <p class="text-xs text-base-content/60">Your account is protected with two-factor authentication</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

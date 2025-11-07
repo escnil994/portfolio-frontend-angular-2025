@@ -1,0 +1,244 @@
+<div class="min-h-screen bg-base-200">
+  <section class="bg-base-100 py-12 border-b border-base-300">
+    <div class="container mx-auto px-4">
+      <div class="max-w-4xl mx-auto">
+        <button routerLink="/blog" class="btn btn-ghost btn-sm gap-2 mb-6">
+          <span class="material-icons">arrow_back</span>
+          Back to Blog
+        </button>
+
+        <div class="mb-4">
+          <span [class]="'badge badge-lg ' + getCategoryColor(post()?.category || '')">
+            {{ post()?.category | titlecase }}
+          </span>
+        </div>
+
+        <h1 class="text-4xl md:text-5xl font-bold mb-6">
+          {{ post()?.title }}
+        </h1>
+
+        <div class="flex flex-wrap items-center gap-4 text-base-content/70">
+          <div class="flex items-center gap-2">
+            <div class="avatar placeholder">
+              <div
+                class="bg-gradient-to-r from-primary via-accent to-primary rounded-full w-10 h-10 flex items-center justify-center">
+                <span class="text-sm font-bold">{{ post()?.author?.charAt(0) }}</span>
+              </div>
+            </div>
+            <span class="font-semibold">{{ post()?.author }}</span>
+          </div>
+          <span>•</span>
+          <div class="flex items-center gap-2">
+            <span class="material-icons text-sm">calendar_today</span>
+            <span>{{ post()?.date | date: 'MMMM d, yyyy' }}</span>
+          </div>
+          <span>•</span>
+          <div class="flex items-center gap-2">
+            <span class="material-icons text-sm">schedule</span>
+            <span>{{ post()?.readTime }}</span>
+          </div>
+          <span>•</span>
+          <div class="flex items-center gap-2">
+            <span class="material-icons text-sm">visibility</span>
+            <span>{{ post()?.views }} views</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-8">
+    <div class="container mx-auto px-4">
+      <div class="max-w-4xl mx-auto">
+
+        @if (isLoading()) {
+        <div class="card bg-base-100 shadow-lg p-12 text-center">
+          <span class="loading loading-spinner loading-lg text-primary"></span>
+          <p class="mt-4 text-base-content/70">Loading post...</p>
+        </div>
+        }
+
+        @else if (error()) {
+        <div class="card bg-base-100 shadow-lg p-12 text-center">
+          <span class="material-icons text-6xl text-error mb-4">error_outline</span>
+          <h2 class="text-2xl font-bold mb-2">Post Not Found</h2>
+          <p class="text-base-content/70 mb-6">{{ error() }}</p>
+          <button routerLink="/blog" class="btn btn-primary gap-2">
+            <span class="material-icons">arrow_back</span>
+            Back to Blog
+          </button>
+        </div>
+        }
+
+        @else if (post()) {
+        <div class="card bg-base-100 shadow-lg">
+
+          @if (post()?.image) {
+          <figure class="relative">
+            <img [src]="post()!.image" [alt]="post()!.title" class="w-full h-[400px] object-cover">
+            <div class="absolute inset-0 bg-gradient-to-t from-base-100/20 to-transparent"></div>
+          </figure>
+          }
+
+          <div class="card-body p-8">
+            @if (post()?.excerpt) {
+            <div class="bg-gradient-to-r from-primary/5 to-accent/5 border-l-4 border-primary rounded-r-lg p-6 mb-8">
+              <div class="flex items-start gap-4">
+                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                  <span class="material-icons text-primary text-lg">lightbulb</span>
+                </div>
+                <div class="flex-1">
+                  <p class="text-xs font-bold text-primary uppercase tracking-wide mb-2">
+                    Key Takeaway
+                  </p>
+                  <p class="text-base text-base-content/90 leading-relaxed">
+                    {{ post()?.excerpt }}
+                  </p>
+                </div>
+              </div>
+            </div>
+            }
+
+            <article class="prose prose-lg max-w-none">
+              <div class="text-base-content/90 leading-relaxed whitespace-pre-line">
+                {{ post()?.content }}
+              </div>
+            </article>
+
+            @if (post()?.tags && parseTags(post()!.tags).length > 0) {
+            <div class="mt-8 pt-6 border-t border-base-300">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="material-icons text-base-content/60">local_offer</span>
+                @for (tag of parseTags(post()!.tags); track tag) {
+                <span class="badge badge-outline">{{ tag }}</span>
+                }
+              </div>
+            </div>
+            }
+          </div>
+
+          @if (post()?.images && post()?.images && post()!.images!.length > 1) {
+          <div class="px-8 pb-6">
+            <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+              <span class="material-icons">photo_library</span>
+              Gallery
+            </h3>
+            <app-image-carousel [images]="post()!.images!" (onImageClick)="openImageModal(post()!.images!, $event)">
+            </app-image-carousel>
+          </div>
+          }
+
+          <div class="border-t border-base-300">
+            <app-reaction-bar [reactions]="post()?.reactions!" [commentsCount]="post()?.comments_count || 0"
+              (onReaction)="handleReaction($event)" (onViewComments)="scrollToComments()"
+              (onToggleComments)="toggleComments()" (onShare)="handleShare()">
+            </app-reaction-bar>
+          </div>
+
+          @if (showComments()) {
+          <div id="comments-section" class="px-8 pb-8 border-t border-base-300">
+            <h3 class="text-2xl font-bold mb-6 mt-6 flex items-center gap-2">
+              <span class="material-icons">forum</span>
+              Comments ({{ post()?.comments_count || 0 }})
+            </h3>
+
+            @if (commentError(); as error) {
+            <div role="alert" class="alert alert-error text-sm p-3 mb-4">
+              <span class="material-icons text-base">error_outline</span>
+              <span>{{ error }}</span>
+            </div>
+            }
+
+            <app-comment-section [comments]="post()?.comments || []" (onCommentSubmit)="handleCommentSubmit($event)">
+            </app-comment-section>
+          </div>
+          }
+        </div>
+        }
+
+        @if (relatedPosts().length > 0 && post()) {
+        <div class="mt-12">
+          <h2 class="text-3xl font-bold mb-6 flex items-center gap-2">
+            <span class="material-icons">article</span>
+            Related Posts
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            @for (relatedPost of relatedPosts(); track relatedPost.id) {
+            <article [routerLink]="['/blog', relatedPost.slug]"
+              class="card bg-base-100 shadow-lg hover:shadow-xl transition-all cursor-pointer group">
+              @if (relatedPost.image) {
+              <figure class="relative overflow-hidden h-48">
+                <img [src]="relatedPost.image" [alt]="relatedPost.title"
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                <div class="absolute top-4 left-4">
+                  <span [class]="'badge ' + getCategoryColor(relatedPost.category)">
+                    {{ relatedPost.category }}
+                  </span>
+                </div>
+              </figure>
+              }
+              <div class="card-body">
+                <h3 class="card-title text-lg group-hover:text-primary transition-colors">
+                  {{ relatedPost.title }}
+                </h3>
+                <p class="text-base-content/70 text-sm line-clamp-2">
+                  {{ relatedPost.excerpt }}
+                </p>
+                <div class="flex items-center gap-2 text-xs text-base-content/60 mt-2">
+                  <span>{{ relatedPost.date | date: 'MMM d, yyyy' }}</span>
+                  <span>•</span>
+                  <span>{{ relatedPost.readTime }}</span>
+                </div>
+              </div>
+            </article>
+            }
+          </div>
+        </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="py-12 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 mt-8">
+    <div class="container mx-auto px-4">
+      <div class="max-w-2xl mx-auto text-center">
+        <span class="material-icons text-5xl mb-4">email</span>
+        <h2 class="text-3xl font-bold mb-3">Never Miss a Post</h2>
+        <p class="text-base-content/70 mb-6">
+          Get the latest articles and tutorials delivered straight to your inbox.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-2 max-w-md mx-auto">
+
+          <input
+            type="email"
+            placeholder="Enter your email"
+            class="form-input flex-1">
+
+          <button class="submit-btn gap-2">
+            <span class="material-icons">send</span>
+            Subscribe
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+
+
+
+
+
+
+  <app-share-modal [isOpen]="showShareModal()" [shareUrl]="shareUrl()" [shareTitle]="shareTitle()"
+    [shareDescription]="shareDescription()" (onClose)="closeShareModal()">
+  </app-share-modal>
+
+  <app-image-modal [images]="selectedImages()" [initialIndex]="selectedImageIndex()" [isOpen]="showImageModal()"
+    (onClose)="closeImageModal()">
+  </app-image-modal>
+
+  <app-user-info-modal [error]="authError()" (onSubmit)="onUserInfoSubmit($event)">
+  </app-user-info-modal>
+</div>

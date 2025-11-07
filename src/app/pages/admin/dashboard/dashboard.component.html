@@ -1,0 +1,366 @@
+<!-- dashboard.component.html - VERSIÓN COMPLETA MEJORADA -->
+
+<section class="hero-section relative min-h-screen overflow-hidden">
+  <!-- Background Effects -->
+  <div class="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5"></div>
+  <div class="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse-slow"></div>
+  <div class="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse-slow"
+    style="animation-delay: 2s;"></div>
+
+  <!-- Header -->
+  <header class="relative z-20 bg-base-100/80 backdrop-blur-md border-b border-base-300 shadow-lg sticky top-0">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center shadow-lg">
+            <span class="material-icons text-white">dashboard</span>
+          </div>
+          <h1 class="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            Admin Dashboard
+          </h1>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <a routerLink="/"
+             target="_blank"
+             class="btn btn-ghost btn-sm gap-2 hidden sm:flex">
+            <span class="material-icons text-base">open_in_new</span>
+            View Site
+          </a>
+
+          <div class="text-right hidden md:block">
+            <p class="text-sm font-medium">{{ user()?.full_name || user()?.username }}</p>
+            <p class="text-xs text-base-content/60">{{ user()?.email }}</p>
+          </div>
+
+          <button (click)="logout()" class="btn btn-error btn-sm gap-2 shadow-lg hover:shadow-xl transition-all group">
+            <span class="material-icons text-base">logout</span>
+            <span class="hidden sm:inline">Logout</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Welcome Card -->
+    <div class="card bg-gradient-to-br from-primary via-primary to-accent shadow-2xl mb-8 animate-fade-in overflow-hidden">
+      <div class="card-body p-8 relative">
+        <!-- Decorative circles -->
+        <div class="absolute -right-12 -top-12 w-48 h-48 bg-white/10 rounded-full"></div>
+        <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-white/10 rounded-full"></div>
+
+        <div class="flex items-center gap-4 relative z-10">
+          <span class="material-icons text-6xl text-white animate-wave">waving_hand</span>
+          <div>
+            <h2 class="text-3xl font-bold text-white mb-2">
+              Welcome back, {{ user()?.full_name || user()?.username }}!
+            </h2>
+            <p class="text-white/90 text-lg">Manage your portfolio content and settings</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Management Section -->
+    <div class="mb-8">
+      <div class="flex items-center gap-2 mb-6">
+        <span class="material-icons text-primary text-2xl">edit_note</span>
+        <h3 class="text-2xl font-bold">Content Management</h3>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        <!-- Projects Card -->
+        <div class="card bg-base-100 shadow-xl border border-base-300 hover:shadow-2xl hover:border-primary/50 transition-all duration-300 group">
+          <div class="card-body">
+            <div class="flex items-start justify-between mb-4">
+              <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                <span class="material-icons text-white text-3xl">work</span>
+              </div>
+              <span class="badge badge-primary badge-lg">Active</span>
+            </div>
+
+            <h3 class="text-xl font-bold mb-2">Projects</h3>
+            <p class="text-base-content/70 text-sm mb-4">
+              Manage your portfolio projects, add new ones or edit existing projects
+            </p>
+
+            <div class="flex gap-2">
+              <a routerLink="/admin/projects"
+                 class="btn btn-outline btn-primary btn-sm flex-1 gap-1 group">
+                <span class="material-icons text-base">view_list</span>
+                View All
+              </a>
+              <a routerLink="/admin/projects/new"
+                 class="btn btn-primary btn-sm flex-1 gap-1">
+                <span class="material-icons text-base">add</span>
+                New
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Blog Posts Card -->
+        <div class="card bg-base-100 shadow-xl border border-base-300 hover:shadow-2xl hover:border-success/50 transition-all duration-300 group">
+          <div class="card-body">
+            <div class="flex items-start justify-between mb-4">
+              <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-success to-success/70 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                <span class="material-icons text-white text-3xl">article</span>
+              </div>
+              <span class="badge badge-success badge-lg">Active</span>
+            </div>
+
+            <h3 class="text-xl font-bold mb-2">Blog Posts</h3>
+            <p class="text-base-content/70 text-sm mb-4">
+              Write and publish blog posts, tutorials and technical articles
+            </p>
+
+            <div class="flex gap-2">
+              <a routerLink="/admin/blog"
+                 class="btn btn-outline btn-success btn-sm flex-1 gap-1">
+                <span class="material-icons text-base">view_list</span>
+                View All
+              </a>
+              <a routerLink="/admin/blog/new"
+                 class="btn btn-success btn-sm flex-1 gap-1">
+                <span class="material-icons text-base">add</span>
+                New
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Messages Card -->
+        <div class="card bg-base-100 shadow-xl border border-base-300 hover:shadow-2xl hover:border-secondary/50 transition-all duration-300 group">
+          <div class="card-body">
+            <div class="flex items-start justify-between mb-4">
+              <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-secondary to-secondary/70 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                <span class="material-icons text-white text-3xl">mail</span>
+              </div>
+              <span class="badge badge-secondary badge-lg">Inbox</span>
+            </div>
+
+            <h3 class="text-xl font-bold mb-2">Messages</h3>
+            <p class="text-base-content/70 text-sm mb-4">
+              View and respond to contact form submissions from visitors
+            </p>
+
+            <a routerLink="/admin/messages"
+               class="btn btn-secondary btn-sm w-full gap-2">
+              <span class="material-icons text-base">inbox</span>
+              View Messages
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Settings & Profile Section -->
+    <div class="mb-8">
+      <div class="flex items-center gap-2 mb-6">
+        <span class="material-icons text-accent text-2xl">settings</span>
+        <h3 class="text-2xl font-bold">Settings & Profile</h3>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- Profile Settings Card -->
+        <div class="card bg-base-100 shadow-xl border border-base-300 hover:shadow-2xl hover:border-accent/50 transition-all duration-300 group">
+          <div class="card-body">
+            <div class="flex items-start gap-4">
+              <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-accent to-accent/70 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
+                <span class="material-icons text-white text-3xl">person</span>
+              </div>
+              <div class="flex-1">
+                <h3 class="text-xl font-bold mb-2">Profile Information</h3>
+                <p class="text-base-content/70 text-sm mb-4">
+                  Update your personal information, bio, skills and social media links
+                </p>
+                <a routerLink="/admin/profile"
+                   class="btn btn-accent btn-sm gap-2">
+                  <span class="material-icons text-base">edit</span>
+                  Edit Profile
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Account Settings Card -->
+        <div class="card bg-base-100 shadow-xl border border-base-300 hover:shadow-2xl hover:border-warning/50 transition-all duration-300 group">
+          <div class="card-body">
+            <div class="flex items-start gap-4">
+              <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-warning to-warning/70 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
+                <span class="material-icons text-white text-3xl">admin_panel_settings</span>
+              </div>
+              <div class="flex-1">
+                <h3 class="text-xl font-bold mb-2">Account Settings</h3>
+                <p class="text-base-content/70 text-sm mb-4">
+                  Manage security settings, password and two-factor authentication
+                </p>
+                <a routerLink="/admin/settings"
+                   class="btn btn-warning btn-sm gap-2">
+                  <span class="material-icons text-base">lock</span>
+                  Security Settings
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Security Status Card -->
+    @if (user()) {
+      <div class="card bg-gradient-to-br from-primary/10 via-accent/5 to-primary/10 border-2 border-primary/20 shadow-xl mb-8">
+        <div class="card-body p-6">
+          <div class="flex items-start gap-4">
+            <div class="w-16 h-16 rounded-full bg-success/20 flex items-center justify-center flex-shrink-0">
+              <span class="material-icons text-success text-3xl">verified_user</span>
+            </div>
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-3">
+                <h4 class="font-bold text-xl">Security Status</h4>
+                <div class="badge badge-success gap-1">
+                  <span class="w-2 h-2 bg-success-content rounded-full animate-pulse"></span>
+                  Active
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <!-- Email 2FA -->
+                <div class="flex items-center justify-between p-3 rounded-lg bg-base-100/50 border border-base-300">
+                  <div class="flex items-center gap-2">
+                    <span class="material-icons text-lg {{ user()?.email_2fa_enabled ? 'text-success' : 'text-error' }}">
+                      {{ user()?.email_2fa_enabled ? 'check_circle' : 'cancel' }}
+                    </span>
+                    <span class="font-medium">Email 2FA</span>
+                  </div>
+                  <div class="badge {{ user()?.email_2fa_enabled ? 'badge-success' : 'badge-error' }} badge-sm">
+                    {{ user()?.email_2fa_enabled ? 'Enabled' : 'Disabled' }}
+                  </div>
+                </div>
+
+                <!-- Authenticator App -->
+                <div class="flex items-center justify-between p-3 rounded-lg bg-base-100/50 border border-base-300">
+                  <div class="flex items-center gap-2">
+                    <span class="material-icons text-lg {{ user()?.totp_enabled ? 'text-success' : 'text-warning' }}">
+                      {{ user()?.totp_enabled ? 'check_circle' : 'info' }}
+                    </span>
+                    <span class="font-medium">Authenticator App</span>
+                  </div>
+                  <div class="badge {{ user()?.totp_enabled ? 'badge-success' : 'badge-warning' }} badge-sm">
+                    {{ user()?.totp_enabled ? 'Enabled' : 'Optional' }}
+                  </div>
+                </div>
+              </div>
+
+              @if (!user()?.totp_enabled || !user()?.email_2fa_enabled) {
+                <div class="alert alert-warning">
+                  <span class="material-icons">info</span>
+                  <div class="flex-1">
+                    <p class="font-semibold">Enhance your account security</p>
+                    <p class="text-sm">Enable two-factor authentication for better protection</p>
+                  </div>
+                  <a routerLink="/admin/settings" class="btn btn-warning btn-sm gap-2">
+                    <span class="material-icons text-base">security</span>
+                    Enable Now
+                  </a>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Quick Actions Grid -->
+    <div class="card bg-base-100 shadow-xl border border-base-300 mb-8">
+      <div class="card-body p-6">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="material-icons text-primary text-xl">flash_on</span>
+          <h3 class="text-xl font-bold">Quick Actions</h3>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <!-- New Project -->
+          <a routerLink="/admin/projects/new"
+             class="flex flex-col items-center gap-2 p-4 rounded-lg hover:bg-primary/10 border-2 border-transparent hover:border-primary transition-all group">
+            <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary group-hover:scale-110 transition-all">
+              <span class="material-icons text-primary group-hover:text-white">add_circle</span>
+            </div>
+            <span class="text-sm font-medium text-center">New Project</span>
+          </a>
+
+          <!-- New Blog -->
+          <a routerLink="/admin/blog/new"
+             class="flex flex-col items-center gap-2 p-4 rounded-lg hover:bg-success/10 border-2 border-transparent hover:border-success transition-all group">
+            <div class="w-12 h-12 rounded-full bg-success/10 flex items-center justify-center group-hover:bg-success group-hover:scale-110 transition-all">
+              <span class="material-icons text-success group-hover:text-white">add_circle</span>
+            </div>
+            <span class="text-sm font-medium text-center">New Blog</span>
+          </a>
+
+          <!-- View Messages -->
+          <a routerLink="/admin/messages"
+             class="flex flex-col items-center gap-2 p-4 rounded-lg hover:bg-secondary/10 border-2 border-transparent hover:border-secondary transition-all group">
+            <div class="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center group-hover:bg-secondary group-hover:scale-110 transition-all">
+              <span class="material-icons text-secondary group-hover:text-white">mail</span>
+            </div>
+            <span class="text-sm font-medium text-center">Messages</span>
+          </a>
+
+          <!-- Settings -->
+          <a routerLink="/admin/settings"
+             class="flex flex-col items-center gap-2 p-4 rounded-lg hover:bg-warning/10 border-2 border-transparent hover:border-warning transition-all group">
+            <div class="w-12 h-12 rounded-full bg-warning/10 flex items-center justify-center group-hover:bg-warning group-hover:scale-110 transition-all">
+              <span class="material-icons text-warning group-hover:text-white">settings</span>
+            </div>
+            <span class="text-sm font-medium text-center">Settings</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Help & Resources -->
+    <div class="card bg-gradient-to-r from-info/10 to-info/5 border border-info/20 shadow-lg">
+      <div class="card-body p-6">
+        <div class="flex items-start gap-4">
+          <span class="material-icons text-info text-3xl">help_outline</span>
+          <div class="flex-1">
+            <h4 class="font-bold text-lg mb-2">Need Help?</h4>
+            <p class="text-base-content/70 text-sm mb-4">
+              Check out the documentation or contact support if you have any questions about managing your portfolio.
+            </p>
+            <div class="flex gap-3">
+              <a routerLink="/"
+                 target="_blank"
+                 class="btn btn-sm btn-outline gap-2">
+                <span class="material-icons text-base">visibility</span>
+                Preview Site
+              </a>
+              <button class="btn btn-sm btn-ghost gap-2">
+                <span class="material-icons text-base">description</span>
+                Documentation
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Back to Portfolio -->
+    <div class="text-center mt-8">
+      <a routerLink="/"
+         class="link link-hover text-primary gap-1 inline-flex items-center group text-lg">
+        <span class="material-icons text-base group-hover:-translate-x-1 transition-transform">home</span>
+        Back to Portfolio
+      </a>
+    </div>
+  </main>
+</section>

@@ -1,0 +1,19 @@
+.reaction-container {
+  .reaction-picker {
+    z-index: 50;
+  }
+
+  &:hover .reaction-picker {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+.reaction-item {
+  cursor: pointer;
+  padding: 0.25rem;
+
+  &:hover {
+    z-index: 10;
+  }
+}

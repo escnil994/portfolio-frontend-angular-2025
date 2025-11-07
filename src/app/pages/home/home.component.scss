@@ -1,0 +1,178 @@
+.scroll-indicator {
+  transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.3s ease;
+
+  &:hover {
+    scale: 1.15;
+
+    .scroll-arrow span {
+      color: #0ea5e9;
+    }
+  }
+}
+
+.scroll-arrow {
+  animation: bounce 2s ease-in-out infinite;
+  display: flex;
+  flex-direction: column;
+  gap: -8px;
+
+  span {
+    transition: color 0.3s;
+  }
+
+  &::before,
+  &::after {
+    content: '';
+    display: block;
+    width: 2px;
+    height: 12px;
+    background: linear-gradient(to bottom, transparent, currentColor);
+    margin: 0 auto;
+    opacity: 0.3;
+  }
+}
+
+.skill-card {
+  background: var(--fallback-b1, oklch(var(--b1)));
+  border-radius: 1.5rem;
+  padding: 2rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(19, 53, 80, 0.1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, currentColor, transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  &:hover {
+    transform: translateY(-12px) scale(1.03);
+
+    &::before {
+      opacity: 1;
+    }
+
+    .skill-icon {
+      transform: scale(1.1) rotate(5deg);
+    }
+  }
+}
+
+.skill-icon {
+  width: 4.5rem;
+  height: 4.5rem;
+  background: linear-gradient(135deg, #133550, #0ea5e9);
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 6px -1px rgba(19, 53, 80, 0.3);
+  flex-shrink: 0;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  margin: 0 auto 1rem;
+  position: relative;
+
+  .material-icons {
+    color: white;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 1rem;
+    background: inherit;
+    filter: blur(8px);
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: -1;
+  }
+
+  .skill-card:hover &::after {
+    opacity: 0.4;
+  }
+}
+
+.project-card {
+  background: var(--fallback-b1, oklch(var(--b1)));
+  border-radius: 1.5rem;
+  padding: 2rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(19, 53, 80, 0.1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #133550, #0ea5e9, #133550);
+    background-size: 300% 300%;
+    border-radius: 1rem;
+    opacity: 0;
+    z-index: -1;
+    transition: opacity 0.5s;
+    animation: gradientShift 3s ease infinite;
+  }
+
+  &:hover {
+    transform: translateY(-16px);
+    box-shadow: 0 25px 50px -12px rgba(14, 165, 233, 0.25);
+
+    &::before {
+      opacity: 0.6;
+    }
+  }
+}
+
+.project-image-wrapper {
+  position: relative;
+  overflow: hidden;
+  height: 15rem;
+
+  .project-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    filter: brightness(0.9);
+  }
+
+  .project-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(19, 53, 80, 0.95) 0%, rgba(14, 165, 233, 0.9) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    backdrop-filter: blur(4px);
+  }
+
+  &:hover {
+    .project-image {
+      transform: scale(1.15);
+      filter: brightness(1);
+    }
+
+    .project-overlay {
+      opacity: 1;
+    }
+  }
+}

@@ -1,0 +1,419 @@
+@if (project(); as proj) {
+<div class="min-h-screen bg-base-200">
+  <section class="relative py-16 overflow-hidden bg-gradient-to-br from-primary/10 via-base-100 to-accent/10">
+    <div class="absolute top-10 left-10 w-64 h-64 bg-primary/10 rounded-full blur-3xl animate-pulse"></div>
+    <div class="absolute bottom-10 right-10 w-80 h-80 bg-accent/10 rounded-full blur-3xl animate-pulse"></div>
+
+    <div class="container mx-auto px-4 relative z-10">
+      <div class="mb-6">
+        <a routerLink="/projects" class="btn btn-ghost gap-2 group">
+          <span class="material-icons group-hover:-translate-x-1 transition-transform">arrow_back</span>
+          Back to Projects
+        </a>
+      </div>
+
+      <div class="max-w-4xl mx-auto text-center">
+        @if (proj.featured) {
+          <div class="badge badge-primary gap-2 mb-4">
+            <span class="material-icons text-sm">star</span>
+            Featured Project
+          </div>
+        }
+
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
+          <span class="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+            {{ proj.title }}
+          </span>
+        </h1>
+
+        <p class="text-lg md:text-xl text-base-content/70 mb-8">
+          {{ proj.description }}
+        </p>
+
+        <div class="flex flex-wrap gap-3 justify-center">
+          @if (proj.demoUrl && !safeVideoUrl()) {
+            <a [href]="proj.demoUrl" target="_blank" class="btn-cta btn-cta-primary group">
+              <span class="material-icons">open_in_new</span>
+              Live Demo
+            </a>
+          }
+          @if (proj.githubUrl) {
+            <a [href]="proj.githubUrl" target="_blank" class="btn-cta btn-cta-outline">
+              <span class="material-icons">code</span>
+              Source Code
+            </a>
+          }
+          <button (click)="handleShare()" class="btn-cta btn-cta-secondary">
+            <span class="material-icons">share</span>
+            Share
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-12">
+    <div class="container mx-auto px-4">
+      <div class="grid lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+        <div class="lg:col-span-2 space-y-6">
+
+          @if (proj.images.length > 0) {
+            <div class="card bg-base-100 shadow-xl">
+              <div class="card-body">
+                <h2 class="card-title text-xl mb-4 flex items-center gap-2">
+                  <span class="material-icons text-primary">photo_library</span>
+                  Project Gallery
+                </h2>
+
+                <app-image-carousel
+                  [images]="proj.images"
+                  (onImageClick)="openLightbox($event)">
+                </app-image-carousel>
+              </div>
+            </div>
+          }
+
+          @if (safeVideoUrl()) {
+            <div class="card bg-base-100 shadow-xl">
+              <div class="card-body">
+                <h2 class="card-title text-xl mb-4 flex items-center gap-2">
+                  <span class="material-icons text-primary">play_circle</span>
+                  Demo Video
+                </h2>
+
+                <div class="aspect-video rounded-lg overflow-hidden bg-black">
+                  <iframe
+                    [src]="safeVideoUrl()"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen
+                    class="w-full h-full">
+                  </iframe>
+                </div>
+              </div>
+            </div>
+          }
+
+          <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+              <h2 class="card-title text-xl mb-4 flex items-center gap-2">
+                <span class="material-icons text-primary">description</span>
+                About This Project
+              </h2>
+
+              <div class="prose max-w-none">
+                <p class="text-base-content/80 leading-relaxed text-base">
+                  {{ proj.description }}
+                </p>
+
+                <div class="mt-6">
+                  <h3 class="text-lg font-bold mb-3 flex items-center gap-2">
+                    <span class="material-icons text-accent">check_circle</span>
+                    Key Features
+                  </h3>
+                  <ul class="space-y-2">
+                    <li class="flex items-start gap-3">
+                      <span class="material-icons text-accent text-base mt-0.5">chevron_right</span>
+                      <span>Modern and responsive design</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                      <span class="material-icons text-accent text-base mt-0.5">chevron_right</span>
+                      <span>Optimized performance and scalability</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                      <span class="material-icons text-accent text-base mt-0.5">chevron_right</span>
+                      <span>Clean and maintainable code architecture</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card bg-base-100 shadow-xl">
+            @if (proj.reactions) {
+              @if (proj.reactions.total_reactions > 0) {
+                <div class="px-4 pt-4">
+                  <div class="flex items-center gap-2 text-sm text-base-content/60">
+                    <div class="flex items-center -space-x-1">
+                      @if (proj.reactions.love_count > 0) {
+                        <div class="w-5 h-5 rounded-full bg-error flex items-center justify-center border border-base-100">
+                          <span class="text-xs">❤️</span>
+                        </div>
+                      }
+                      @if (proj.reactions.like_count > 0) {
+                        <div class="w-5 h-5 rounded-full bg-primary flex items-center justify-center border border-base-100">
+                          <span class="text-xs">👍</span>
+                        </div>
+                      }
+                      @if (proj.reactions.congratulations_count > 0) {
+                        <div class="w-5 h-5 rounded-full bg-warning flex items-center justify-center border border-base-100">
+                          <span class="text-xs">🎉</span>
+                        </div>
+                      }
+                    </div>
+                    <span>{{ proj.reactions.total_reactions }} {{ proj.reactions.total_reactions === 1 ? 'reaction' : 'reactions' }}</span>
+                  </div>
+                </div>
+              }
+
+              <div class="flex items-center border-t border-base-300">
+                <div class="flex-1 relative reaction-container">
+                  <button
+                    class="w-full py-3 px-4 flex items-center justify-center gap-2 hover:bg-base-200 transition-colors rounded-none"
+                    [class.text-error]="proj.reactions.user_reaction === 'love'"
+                    [class.text-primary]="proj.reactions.user_reaction === 'like'"
+                    [class.text-warning]="proj.reactions.user_reaction === 'congratulations'"
+                    [class.font-semibold]="proj.reactions.user_reaction">
+                    <span class="material-icons text-xl">
+                      {{ proj.reactions.user_reaction ? 'favorite' : 'favorite_border' }}
+                    </span>
+                    <span class="text-sm">{{ getReactionLabel() }}</span>
+                  </button>
+
+                  <div class="reaction-picker absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-base-100 shadow-2xl rounded-full p-3 flex gap-2 opacity-0 invisible transition-all duration-300 border border-base-300">
+                    @for (reaction of availableReactions; track reaction.type) {
+                      <button
+                        (click)="handleReaction(reaction.type)"
+                        class="reaction-item flex flex-col items-center gap-1 hover:scale-125 transition-transform relative group">
+                        <span class="text-3xl">{{ reaction.icon }}</span>
+
+                        <div class="absolute -bottom-8 px-2 py-1 bg-base-300 text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                          {{ reaction.label }}
+                        </div>
+                      </button>
+                    }
+                  </div>
+                </div>
+
+                <button
+                  (click)="handleShare()"
+                  class="flex-1 py-3 px-4 flex items-center justify-center gap-2 hover:bg-base-200 transition-colors border-l border-base-300">
+                  <span class="material-icons text-xl">share</span>
+                  <span class="text-sm">Share</span>
+                </button>
+              </div>
+            }
+          </div>
+
+          <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+              <div class="flex items-center justify-between mb-6">
+                <h2 class="card-title text-xl flex items-center gap-2">
+                  <span class="material-icons text-primary">comment</span>
+                  Comments
+                  @if (proj.comments_count !== undefined && proj.comments_count > 0) {
+                    <span class="badge badge-primary">{{ proj.comments_count }}</span>
+                  }
+                </h2>
+              </div>
+
+              <div class="mb-6">
+                <div class="bg-base-200 rounded-lg p-4">
+                  <h3 class="font-semibold mb-3 flex items-center gap-2">
+                    <span class="material-icons text-sm">edit</span>
+                    Leave a Comment
+                  </h3>
+
+                  @if (commentError(); as error) {
+                    <div role="alert" class="alert alert-error text-sm p-3 mb-4">
+                      <span class="material-icons text-base">error_outline</span>
+                      <span>{{ error }}</span>
+                    </div>
+                  }
+                  <app-comment-section
+                    [comments]="[]"
+                    [showCommentsList]="false"
+                    (onCommentSubmit)="handleCommentSubmit($event)">
+                  </app-comment-section>
+                </div>
+              </div>
+
+              @if (proj.comments && proj.comments.length > 0) {
+                <div class="space-y-4">
+                  <h3 class="font-semibold text-base flex items-center gap-2 mb-2">
+                    <span class="material-icons text-sm">forum</span>
+                    All Comments ({{ proj.comments.length }})
+                  </h3>
+
+                  @for (comment of proj.comments; track comment.id) {
+                    <div class="border-l-2 border-primary/30 pl-4 py-2">
+                      <div class="flex items-start gap-3">
+                        <div class="avatar placeholder">
+                          <div class="bg-primary text-primary-content rounded-full w-10 h-10">
+                            <span class="text-sm">{{ comment.name.charAt(0) }}</span>
+                          </div>
+                        </div>
+                        <div class="flex-1">
+                          <div class="flex items-center gap-2 mb-1">
+                            <span class="font-semibold">{{ comment.name }}</span>
+                            <span class="text-xs text-base-content/60">
+                              {{ comment.created_at | date: 'MMM d, yyyy' }}
+                            </span>
+                          </div>
+                          <p class="text-base-content/80 text-sm">{{ comment.content }}</p>
+                        </div>
+                      </div>
+                    </div>
+                  }
+                </div>
+              } @else {
+                <div class="text-center py-8 text-base-content/60">
+                  <span class="material-icons text-4xl mb-2">chat_bubble_outline</span>
+                  <p class="text-sm">No comments yet. Be the first to comment!</p>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-6">
+          <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+              <h3 class="card-title text-lg flex items-center gap-2">
+                <span class="material-icons text-primary">code</span>
+                Technologies
+              </h3>
+
+              <div class="flex flex-wrap gap-2 mt-2">
+                @for (tech of proj.technologies; track tech) {
+                  <div class="badge badge-outline badge-lg">{{ tech }}</div>
+                }
+              </div>
+            </div>
+          </div>
+
+          @if (proj.reactions) {
+            <div class="card bg-base-100 shadow-xl">
+              <div class="card-body">
+                <h3 class="card-title text-lg flex items-center gap-2">
+                  <span class="material-icons text-primary">insights</span>
+                  Engagement
+                </h3>
+
+                <div class="space-y-3 mt-2">
+                  <div class="flex justify-between items-center">
+                    <span class="text-sm text-base-content/70">Total Reactions</span>
+                    <span class="font-bold text-lg">{{ proj.reactions.total_reactions }}</span>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <span class="text-sm text-base-content/70">Comments</span>
+                    <span class="font-bold text-lg">{{ proj.comments_count || 0 }}</span>
+                  </div>
+                </div>
+
+                <div class="divider my-2"></div>
+
+                <div class="grid grid-cols-3 gap-2">
+                  <div class="text-center p-2 rounded-lg bg-base-200">
+                    <div class="text-2xl">👍</div>
+                    <div class="text-xs font-bold">{{ proj.reactions.like_count }}</div>
+                  </div>
+                  <div class="text-center p-2 rounded-lg bg-base-200">
+                    <div class="text-2xl">❤️</div>
+                    <div class="text-xs font-bold">{{ proj.reactions.love_count }}</div>
+                  </div>
+                  <div class="text-center p-2 rounded-lg bg-base-200">
+                    <div class="text-2xl">🎉</div>
+                    <div class="text-xs font-bold">{{ proj.reactions.congratulations_count }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+
+          <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+              <h3 class="card-title text-lg flex items-center gap-2">
+                <span class="material-icons text-primary">info</span>
+                Status
+              </h3>
+
+              <div class="mt-2">
+                <div class="flex items-center gap-2 p-3 rounded-lg bg-success/10 border border-success/20">
+                  <div class="w-2 h-2 bg-success rounded-full animate-pulse"></div>
+                  <span class="text-success font-semibold">Completed</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          @if (proj.githubUrl || proj.demoUrl) {
+            <div class="card bg-base-100 shadow-xl">
+              <div class="card-body">
+                <h3 class="card-title text-lg flex items-center gap-2">
+                  <span class="material-icons text-primary">link</span>
+                  Quick Links
+                </h3>
+
+                <div class="space-y-2 mt-2">
+                  @if (proj.githubUrl) {
+                    <a [href]="proj.githubUrl" target="_blank" class="btn-project w-full">
+                      <span class="material-icons text-base">code</span>
+                      Source Code
+                    </a>
+                  }
+
+                  @if (proj.demoUrl && !safeVideoUrl()) {
+                    <a [href]="proj.demoUrl" target="_blank" class="btn-project w-full">
+                      <span class="material-icons text-base">launch</span>
+                      Live Demo
+                    </a>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-16 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10">
+    <div class="container mx-auto px-4 text-center">
+      <h2 class="text-3xl md:text-4xl font-bold mb-4">
+        Interested in Similar Projects?
+      </h2>
+      <p class="text-lg text-base-content/70 mb-6 max-w-2xl mx-auto">
+        Let's discuss how I can help bring your ideas to life.
+      </p>
+      <div class="flex gap-3 justify-center flex-wrap">
+        <a routerLink="/projects" class="btn-back">
+          <span class="material-icons">arrow_back</span>
+          View More Projects
+        </a>
+        <a routerLink="/contact" class="btn-cta btn-cta-primary">
+          <span class="material-icons">send</span>
+          Get in Touch
+        </a>
+      </div>
+    </div>
+  </section>
+</div>
+
+<app-image-modal
+  [images]="proj.images"
+  [initialIndex]="selectedImageIndex()"
+  [isOpen]="lightboxOpen()"
+  (onClose)="closeLightbox()">
+</app-image-modal>
+
+<app-share-modal
+  [isOpen]="showShareModal()"
+  [shareUrl]="shareUrl()"
+  [shareTitle]="shareTitle()"
+  (onClose)="closeShareModal()">
+</app-share-modal>
+
+<app-user-info-modal
+  [error]="authError()"
+  (onSubmit)="onUserInfoSubmit($event)">
+</app-user-info-modal>
+} @else {
+<div class="min-h-screen bg-base-100 flex items-center justify-center">
+  <div class="text-center">
+    <span class="loading loading-spinner loading-lg text-primary"></span>
+    <p class="text-base-content/60 mt-4">Loading project...</p>
+  </div>
+</div>
+}

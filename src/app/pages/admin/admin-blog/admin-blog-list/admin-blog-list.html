@@ -1,0 +1,116 @@
+<!-- admin-blog-list.component.html -->
+
+<section class="min-h-screen bg-base-200 py-8">
+  <div class="container mx-auto px-4">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h1 class="text-4xl font-bold mb-2">
+          <span class="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            Manage Blog Posts
+          </span>
+        </h1>
+        <p class="text-base-content/70">Create, edit and manage your blog posts</p>
+      </div>
+      <a routerLink="/admin/posts/new" class="btn btn-primary gap-2">
+        <span class="material-icons">add</span>
+        New Post
+      </a>
+    </div>
+
+    <!-- Loading State -->
+    @if (loading()) {
+    <div class="flex justify-center items-center min-h-[400px]">
+      <span class="loading loading-spinner loading-lg text-primary"></span>
+    </div>
+    }
+
+    <!-- Posts Grid -->
+    @if (!loading() && posts().length > 0) {
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      @for (post of posts(); track post.id) {
+      <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-all">
+        <!-- Image -->
+        <figure class="relative h-48">
+          <img [src]="post.image" [alt]="post.title" class="w-full h-full object-cover">
+          @if (post.published) {
+          <div class="badge badge-success absolute top-3 right-3 gap-1">
+            <span class="material-icons text-xs">check_circle</span>
+            Published
+          </div>
+          } @else {
+          <div class="badge badge-warning absolute top-3 right-3 gap-1">
+            <span class="material-icons text-xs">edit</span>
+            Draft
+          </div>
+          }
+        </figure>
+
+        <div class="card-body">
+          <h3 class="card-title text-lg">{{ post.title }}</h3>
+          <p class="text-sm text-base-content/70 line-clamp-2">{{ post.excerpt }}</p>
+
+          <!-- Meta Info -->
+          <div class="flex items-center gap-3 text-xs text-base-content/60 mt-2">
+            <span class="flex items-center gap-1">
+              <span class="material-icons text-xs">person</span>
+              {{ post.author }}
+            </span>
+            <span class="flex items-center gap-1">
+              <span class="material-icons text-xs">visibility</span>
+              {{ post.views }}
+            </span>
+          </div>
+
+          <!-- Tags -->
+          @if (post.tags) {
+          <div class="flex flex-wrap gap-1 mt-2">
+            @for (tag of post.tags.split(',').slice(0, 3); track tag) {
+            <div class="badge badge-outline badge-xs">{{ tag.trim() }}</div>
+            }
+          </div>
+          }
+
+          <!-- Actions -->
+          <div class="card-actions justify-end mt-4">
+            <a [routerLink]="['/blog', post.slug]" target="_blank" class="btn btn-ghost btn-sm gap-1">
+              <span class="material-icons text-sm">visibility</span>
+              View
+            </a>
+            <a [routerLink]="['/admin/blog', post.slug]" class="btn btn-primary btn-sm gap-1">
+              <span class="material-icons text-sm">edit</span>
+              Edit
+            </a>
+            <button (click)="deletePost(post)" class="btn btn-error btn-sm gap-1">
+              <span class="material-icons text-sm">delete</span>
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+      }
+    </div>
+    }
+
+    <!-- Empty State -->
+    @if (!loading() && posts().length === 0) {
+    <div class="card bg-base-100 shadow-xl p-12 text-center">
+      <span class="material-icons text-6xl text-base-content/30 mb-4">article</span>
+      <h3 class="text-2xl font-bold mb-2">No posts yet</h3>
+      <p class="text-base-content/70 mb-6">Start by creating your first blog post</p>
+      <a routerLink="/admin/posts/new" class="btn btn-primary gap-2 mx-auto">
+        <span class="material-icons">add</span>
+        Create Post
+      </a>
+    </div>
+    }
+
+    <!-- Back Button -->
+    <div class="text-center mt-8">
+      <a routerLink="/admin/dashboard" class="link link-hover text-primary gap-1 inline-flex items-center">
+        <span class="material-icons text-sm">arrow_back</span>
+        Back to Dashboard
+      </a>
+    </div>
+  </div>
+</section>

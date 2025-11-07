@@ -1,0 +1,115 @@
+<section class="hero-section relative min-h-screen flex items-center justify-center overflow-hidden">
+  <!-- Background Effects -->
+  <div class="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5"></div>
+  <div class="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse-slow"></div>
+  <div class="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse-slow"
+    style="animation-delay: 2s;"></div>
+
+  <div class="container mx-auto px-4 relative z-10">
+    <div class="max-w-md mx-auto">
+      <!-- Header -->
+      <div class="text-center mb-8 animate-fade-in">
+        <div class="mb-6">
+          <div
+            class="w-20 h-20 mx-auto bg-gradient-to-br from-primary to-accent rounded-2xl flex items-center justify-center shadow-lg shadow-primary/20">
+            <span class="material-icons text-4xl text-white">lock</span>
+          </div>
+        </div>
+        <h1 class="text-4xl md:text-5xl font-bold mb-3">
+          <span class="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+            Welcome Back
+          </span>
+        </h1>
+        <p class="text-base-content/70 text-lg">Sign in to access admin panel</p>
+      </div>
+
+      <!-- Login Form Card -->
+      <div class="card bg-base-100 shadow-2xl border border-base-300 animate-slide-up">
+        <div class="card-body p-8">
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-6">
+            <!-- Error Message -->
+            @if (errorMessage()) {
+            <div class="alert alert-error shadow-lg animate-shake">
+              <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>{{ errorMessage() }}</span>
+            </div>
+            }
+
+            <!-- Email Input -->
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text font-semibold">Email Address</span>
+              </label>
+              <div class="relative">
+                <span class="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-base-content/40">email</span>
+                <input type="email" formControlName="email" placeholder="admin@example.com"
+                  class="input input-bordered w-full pl-12 focus:input-primary transition-all"
+                  [class.input-error]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" />
+              </div>
+              @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
+              <label class="label">
+                <span class="label-text-alt text-error">Valid email is required</span>
+              </label>
+              }
+            </div>
+
+            <!-- Password Input -->
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text font-semibold">Password</span>
+              </label>
+              <div class="relative">
+                <span class="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-base-content/40">lock</span>
+                <input type="password" formControlName="password" placeholder="••••••••"
+                  class="input input-bordered w-full pl-12 focus:input-primary transition-all"
+                  [class.input-error]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" />
+              </div>
+              @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+              <label class="label">
+                <span class="label-text-alt text-error">Password must be at least 8 characters</span>
+              </label>
+              }
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" [disabled]="loginForm.invalid || authService.loading()"
+              class="btn btn-primary w-full gap-2 shadow-lg hover:shadow-xl transition-all group">
+              @if (authService.loading()) {
+              <span class="loading loading-spinner"></span>
+              Signing In...
+              } @else {
+              <span class="material-icons">login</span>
+              Sign In
+              <span class="material-icons group-hover:translate-x-1 transition-transform">arrow_forward</span>
+              }
+            </button>
+
+            <!-- Back to Home -->
+            <div class="text-center pt-4">
+              <a routerLink="/" class="link link-hover text-primary gap-1 inline-flex items-center group">
+                <span class="material-icons text-sm group-hover:-translate-x-1 transition-transform">arrow_back</span>
+                Back to Home
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Security Badge -->
+      <div class="text-center mt-6 animate-fade-in" style="animation-delay: 0.3s;">
+        <div class="inline-flex items-center gap-2 bg-base-100/50 backdrop-blur-sm px-4 py-2 rounded-full border border-base-300">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-success" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd"
+              d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+              clip-rule="evenodd" />
+          </svg>
+          <span class="text-sm text-base-content/70">2FA enabled for security</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

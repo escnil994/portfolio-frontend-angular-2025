@@ -1,0 +1,211 @@
+<div class="min-h-screen bg-base-200">
+  <section class="bg-base-100 py-12 border-b border-base-300">
+    <div class="container mx-auto px-4">
+      <div class="max-w-3xl mx-auto text-center">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">
+          <span class="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+            Blog
+          </span>
+        </h1>
+        <p class="text-lg text-base-content/70 mb-6">
+          Thoughts, tutorials, and insights about DevOps, Cloud, and Development
+        </p>
+
+        <div class="flex flex-wrap gap-3 justify-center">
+          @for (category of categories; track category) {
+          <button (click)="filterByCategory(category)" [class.active]="selectedCategory() === category"
+            class="filter-btn">
+            {{ category | titlecase }}
+          </button>
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-6">
+    <div class="container mx-auto px-4">
+      <div class="max-w-3xl mx-auto space-y-4">
+        @for (post of filteredPosts; track post.id) {
+        <article class="card bg-base-100 shadow-lg hover:shadow-xl transition-shadow">
+
+          <div class="p-4 pb-0">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="avatar placeholder">
+                <div
+                  class="bg-gradient-to-r from-primary via-accent to-primary rounded-full w-12 h-12 flex items-center justify-center">
+                  <span class="text-bold">{{ post.author.charAt(0) }}</span>
+                </div>
+              </div>
+              <div class="flex-1">
+                <h3 class="font-semibold">{{ post.author }}</h3>
+                <div class="flex items-center gap-2 text-sm text-base-content/60">
+                  <span>{{ post.date | date: 'MMM d, yyyy' }}</span>
+                  <span>•</span>
+                  <span>{{ post.readTime }}</span>
+                </div>
+              </div>
+              <div [class]="'badge ' + getCategoryColor(post.category)">
+                {{ post.category }}
+              </div>
+            </div>
+
+            <h2 class="text-2xl font-bold mb-3">
+              <a [routerLink]="['/blog', post.slug]" class="hover:underline hover:text-primary transition-colors">
+                {{ post.title }}
+              </a>
+            </h2>
+
+            @if (!isPostExpanded(post.id)) {
+            <p class="text-base-content/70 mb-3 line-clamp-2">
+              {{ post.excerpt }}
+            </p>
+
+            <button (click)="togglePostExpanded(post.id)"
+              class="text-sm font-medium text-primary hover:underline mb-3 inline-flex items-center gap-1">
+              Read more
+              <span class="material-icons text-sm">expand_more</span>
+            </button>
+            }
+          </div>
+
+          @if (isPostExpanded(post.id)) {
+          <div class="px-4 pb-3">
+            <div class="prose prose-sm max-w-none text-base-content/80 mb-4">
+              <p class="whitespace-pre-line">{{ post.content }}</p>
+            </div>
+
+            @if (post.excerpt) {
+            <div class="bg-gradient-to-r from-primary/5 to-accent/5 border-l-4 border-primary rounded-r-lg p-4 mb-3">
+              <div class="flex items-start gap-3">
+                <div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                  <span class="material-icons text-primary text-base">lightbulb</span>
+                </div>
+                <div class="flex-1">
+                  <p class="text-xs font-bold text-primary uppercase tracking-wide mb-1.5">
+                    Key Takeaway
+                  </p>
+                  <p class="text-sm text-base-content/80 leading-relaxed">
+                    {{ post.excerpt }}
+                  </p>
+                </div>
+              </div>
+            </div>
+            }
+
+            <button (click)="togglePostExpanded(post.id)"
+              class="text-sm font-medium text-primary hover:underline inline-flex items-center gap-1">
+              Show less
+              <span class="material-icons text-sm">expand_less</span>
+            </button>
+          </div>
+          }
+
+          @if (post.images && post.images.length > 0) {
+          <app-image-carousel [images]="post.images" (onImageClick)="openImageModal(post.images!, $event)">
+          </app-image-carousel>
+          }
+
+          <div>
+            <app-reaction-bar [reactions]="post.reactions" [commentsCount]="post.comments_count"
+              (onReaction)="handleReaction(post.id, $event)" (onViewComments)="viewComments(post.id)"
+              (onToggleComments)="toggleComments(post.id)" (onShare)="handleShare(post.id)">
+            </app-reaction-bar>
+          </div>
+
+          @if (isCommentsOpen(post.id)) {
+          <div class="px-4 pb-4 border-t border-base-300">
+
+            @if (commentError() && commentErrorPostId() === post.id) {
+            <div role="alert" class="alert alert-error text-sm p-3 mt-4">
+              <span class="material-icons text-base">error_outline</span>
+              <span>{{ commentError() }}</span>
+            </div>
+            }
+
+            <app-comment-section [comments]="post.comments"
+              (onCommentSubmit)="handleCommentSubmit(post.id, post.slug, $event)">
+            </app-comment-section>
+          </div>
+          }
+        </article>
+        }
+
+        @if (filteredPosts.length === 0) {
+        <div class="card bg-base-100 shadow-lg p-12 text-center">
+          <span class="material-icons text-6xl text-base-content/30 mb-4">article</span>
+          <p class="text-xl text-base-content/60">No posts found in this category</p>
+        </div>
+        }
+      </div>
+    </div>
+  </section>
+
+
+  <section class="py-12 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 mt-8">
+    <div class="container mx-auto px-4">
+      <div class="max-w-2xl mx-auto text-center">
+        <h2 class="text-3xl font-bold mb-3">Stay Updated</h2>
+        <p class="text-base-content/70 mb-6">
+          Subscribe to get the latest posts delivered to your inbox.
+        </p>
+
+        <div class="space-y-4">
+          <div class="flex flex-col sm:flex-row gap-2 max-w-md mx-auto">
+            <input
+              type="email"
+              [formControl]="subscriptionEmail"
+              class="form-input flex-1"
+              placeholder="Enter your email"
+              (keydown.enter)="onSubscribe()"
+            >
+
+            <button
+              type="button"
+              (click)="onSubscribe()"
+              class="submit-btn gap-2"
+            >
+              @if (subscriptionLoading()) {
+                <span class="loading loading-spinner loading-sm"></span>
+                <span>Subscribing...</span>
+              } @else {
+                <span class="material-icons">send</span>
+                <span>Subscribe</span>
+              }
+            </button>
+          </div>
+
+          @if (subscriptionMessage()) {
+            <div role="alert" class="alert alert-success max-w-md mx-auto">
+              <span class="material-icons">check_circle</span>
+              <span>{{ subscriptionMessage() }}</span>
+            </div>
+          }
+
+          @if (subscriptionError()) {
+            <div role="alert" class="alert alert-error max-w-md mx-auto">
+              <span class="material-icons">error_outline</span>
+              <span>{{ subscriptionError() }}</span>
+            </div>
+          }
+        </div>
+
+        <p class="text-xs text-base-content/50 mt-4">
+          We'll send you an email to verify your subscription. You can unsubscribe at any time.
+        </p>
+      </div>
+    </div>
+  </section>
+
+
+  <app-share-modal [isOpen]="showShareModal()" [shareUrl]="sharePostUrl()" [shareTitle]="sharePostTitle()"
+    [shareDescription]="sharePostDescription()" (onClose)="closeShareModal()">
+  </app-share-modal>
+
+  <app-image-modal [images]="selectedImages()" [initialIndex]="selectedImageIndex()" [isOpen]="showImageModal()"
+    (onClose)="closeImageModal()">
+  </app-image-modal>
+
+  <app-user-info-modal [error]="authError()" (onSubmit)="onUserInfoSubmit($event)">
+  </app-user-info-modal>
+</div>

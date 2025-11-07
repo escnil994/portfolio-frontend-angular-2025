@@ -1,0 +1,138 @@
+<div class="min-h-screen bg-base-100">
+  <section class="relative py-20 overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5"></div>
+    <div class="absolute top-10 left-10 w-64 h-64 bg-primary/10 rounded-full blur-3xl animate-pulse"></div>
+    <div class="absolute bottom-10 right-10 w-80 h-80 bg-accent/10 rounded-full blur-3xl animate-pulse"></div>
+
+    <div class="container mx-auto px-4 relative z-10">
+      <div class="text-center">
+        <h1 class="text-5xl md:text-6xl font-bold mb-4">
+          <span class="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+            My Projects
+          </span>
+        </h1>
+        <p class="text-xl text-base-content/70 max-w-2xl mx-auto mb-8">
+          A collection of my work showcasing various technologies and solutions
+        </p>
+
+        <div class="flex flex-wrap gap-3 justify-center">
+          @for (category of categories; track category) {
+            <button
+              (click)="filterByCategory(category)"
+              [class.active]="selectedCategory() === category"
+              class="filter-btn">
+              {{ category | titlecase }}
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-20 bg-base-200">
+    <div class="container mx-auto px-4">
+
+      @if (loading()) {
+        <div class="flex justify-center items-center min-h-[400px]">
+          <div class="loading loading-spinner loading-lg text-primary"></div>
+        </div>
+      }
+
+      @else if (filteredProjects.length > 0) {
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          @for (project of filteredProjects; track project.id) {
+          <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 group">
+
+            @if (project.featured) {
+              <div class="badge badge-primary absolute top-4 right-4 z-10 gap-2">
+                <span class="material-icons text-sm">star</span>
+                Featured
+              </div>
+            }
+
+            <figure class="relative overflow-hidden h-64">
+              <img [src]="project.image"
+                   [alt]="project.title"
+                   class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+              <div class="absolute inset-0 bg-gradient-to-t from-primary/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-6 gap-3">
+                <a [routerLink]="['/projects', project.id]" class="btn btn-sm btn-circle btn-ghost text-white">
+                  <span class="material-icons">visibility</span>
+                </a>
+                @if (project.demoUrl) {
+                  <a [href]="project.demoUrl" target="_blank" class="btn btn-sm btn-circle btn-ghost text-white">
+                    <span class="material-icons">open_in_new</span>
+                  </a>
+                }
+                @if (project.githubUrl) {
+                  <a [href]="project.githubUrl" target="_blank" class="btn btn-sm btn-circle btn-ghost text-white">
+                    <span class="material-icons">code</span>
+                  </a>
+                }
+              </div>
+            </figure>
+
+            <div class="card-body">
+              <h2 class="card-title">
+                <a [routerLink]="['/projects', project.id]" class="hover:text-primary transition-colors">
+                  {{ project.title }}
+                </a>
+              </h2>
+
+              <p class="text-base-content/70 line-clamp-3">
+                {{ project.description }}
+              </p>
+
+              <div class="flex flex-wrap gap-2 mt-4">
+                @for (tech of project.technologies.slice(0, 4); track tech) {
+                  <div class="badge badge-outline badge-sm">{{ tech }}</div>
+                }
+                @if (project.technologies.length > 4) {
+                  <div class="badge badge-primary badge-sm">
+                    +{{ project.technologies.length - 4 }}
+                  </div>
+                }
+              </div>
+
+              <div class="card-actions justify-end mt-4">
+                <a [routerLink]="['/projects', project.id]" class="btn-project">
+                  <span class="material-icons text-sm">visibility</span>
+                  View Details
+                </a>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+      }
+
+      @else {
+        <div class="flex flex-col justify-center items-center min-h-[400px] text-center">
+          <span class="material-icons text-6xl text-base-content/30 mb-4">folder_off</span>
+          <h3 class="text-2xl font-bold mb-2">No projects found</h3>
+          <p class="text-base-content/70 mb-4">
+            No projects match the selected category: <span class="badge badge-primary">{{ selectedCategory() }}</span>
+          </p>
+          <button (click)="filterByCategory('all')" class="btn btn-primary">
+            View All Projects
+          </button>
+        </div>
+      }
+
+    </div>
+  </section>
+
+  <section class="py-20 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10">
+    <div class="container mx-auto px-4 text-center">
+      <h2 class="text-4xl md:text-5xl font-bold mb-6">
+        Interested in Working Together?
+      </h2>
+      <p class="text-xl text-base-content/70 mb-8 max-w-2xl mx-auto">
+        I'm always open to discussing new projects and opportunities.
+      </p>
+      <a routerLink="/contact" class="btn-cta btn-cta-primary group">
+        <span class="material-icons mr-2">send</span>
+        Let's Talk
+      </a>
+    </div>
+  </section>
+</div>
