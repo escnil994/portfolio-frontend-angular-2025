@@ -41,3 +41,8 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+
+#private files
+gcloud-key-base64.txt
+gcloud-key.json
