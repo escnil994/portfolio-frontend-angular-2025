@@ -2,7 +2,8 @@ import { Component, OnInit, inject, signal, computed, HostListener } from '@angu
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../services/api.service';
-import { Project, ProjectUI, Skill } from '../../interfaces/portfolio.interface';
+import { ProjectService } from '../../services/project.service';
+import { ProjectUI, Skill } from '../../interfaces/portfolio.interface';
 import { AnimateOnScrollDirective } from '../../directives/animate-on-scroll.directive';
 import { LoaderComponent } from '../../directives/loader.component';
 
@@ -14,103 +15,57 @@ import { LoaderComponent } from '../../directives/loader.component';
   styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements OnInit {
-  apiService = inject(ApiService);
+  private apiService = inject(ApiService);
+  private projectService = inject(ProjectService);
+
   profile = this.apiService.profile;
-  profileLoading = this.apiService.profileLoading;
-  projectsLoading = this.apiService.projectsLoading;
+  profileLoading = this.apiService.loading;
+
   featuredProjects = signal<ProjectUI[]>([]);
-  showScrollIndicator = signal(true);
+  projectsLoading = signal<boolean>(true);
+  scrollOpacity = signal<number>(1);
 
   displayName = computed(() => {
-    const profileData = this.profile();
-    if (!profileData) return '';
-
-    if (profileData.display_name) {
-      return profileData.display_name;
-    }
-
-    return `${profileData.name} ${profileData.last_name || ''}`.trim();
+    const p = this.profile();
+    if (!p) return '';
+    return p.display_name || `${p.name} ${p.last_name || ''}`.trim();
   });
 
   skills = computed(() => {
-    const profileData = this.profile();
-    if (!profileData?.skills) {
-      return [];
-    }
+    const p = this.profile();
+    if (!p?.skills) return [];
 
-    let skillsData = profileData.skills;
-    if (typeof skillsData === 'string') {
+    const raw = p.skills as any;
+    if (typeof raw === 'string') {
       try {
-        skillsData = JSON.parse(skillsData);
-      } catch (e) {
-        console.error('Error parsing skills:', e);
+        const parsed = JSON.parse(raw);
+        return (parsed.skills || parsed) as Skill[];
+      } catch {
         return [];
       }
     }
-
-    if (skillsData && typeof skillsData === 'object' && 'skills' in skillsData) {
-      return skillsData.skills || [];
-    }
-
-    return [];
+    return (raw.skills || raw) as Skill[];
   });
 
-  topSkills = computed(() => {
-    return this.skills().slice(0, 16);
-  });
+  topSkills = computed(() => this.skills().slice(0, 16));
 
   @HostListener('window:scroll')
   onWindowScroll() {
     const scrollPosition = window.scrollY;
     const opacity = Math.max(0, 1 - scrollPosition / 200);
-
-    const indicator = document.querySelector('.scroll-indicator') as HTMLElement;
-    if (indicator) {
-      indicator.style.opacity = opacity.toString();
-      indicator.style.pointerEvents = opacity > 0.1 ? 'auto' : 'none';
-    }
+    this.scrollOpacity.set(opacity);
   }
 
   ngOnInit() {
-    this.loadData();
-  }
-
-  private loadData() {
     this.apiService.getProfile().subscribe();
 
-    this.apiService.getProjects(0, 2, true).subscribe({
-      next: (backendProjects: Project[]) => {
-        const mappedProjects = backendProjects.map(proj => this.mapBackendProject(proj));
-        this.featuredProjects.set(mappedProjects);
+    this.projectService.getProjects(0, 3, true).subscribe({
+      next: (projects) => {
+        this.featuredProjects.set(projects);
+        this.projectsLoading.set(false);
       },
-      error: (error) => {
-        console.error('Error loading featured projects:', error);
-      }
+      error: () => this.projectsLoading.set(false)
     });
-  }
-
-  private mapBackendProject(backendProj: Project): ProjectUI {
-    const imageUrls = backendProj.images
-      .sort((a, b) => a.image_order - b.image_order)
-      .map(img => img.image_url);
-
-    return {
-      id: backendProj.id,
-      title: backendProj.title,
-      description: backendProj.description,
-      image: imageUrls.length > 0
-        ? imageUrls[0]
-        : 'https://via.placeholder.com/800x600?text=No+Image',
-      images: imageUrls.length > 0
-        ? imageUrls
-        : ['https://via.placeholder.com/800x600?text=No+Image'],
-      featured: backendProj.featured,
-      technologies: backendProj.technologies
-        ? backendProj.technologies.split(',').map(t => t.trim())
-        : [],
-      githubUrl: backendProj.github_url || undefined,
-      demoUrl: backendProj.demo_url || undefined
-    };
   }
 
   scrollToSkills() {
@@ -122,6 +77,8 @@ export class HomeComponent implements OnInit {
   }
 
   getTopSkillsByProficiency(limit: number = 12): Skill[] {
-    return [...this.skills()].sort((a, b) => b.proficiency - a.proficiency).slice(0, limit);
+    return [...this.skills()]
+      .sort((a, b) => b.proficiency - a.proficiency)
+      .slice(0, limit);
   }
 }

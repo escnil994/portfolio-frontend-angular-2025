@@ -17,6 +17,7 @@ import { BlogService } from '../../../services/blog.service';
 import { SubscriptionService } from '../../../services/subscription.service';
 import { ReactionType } from '../../../enums/reaction-type.enum';
 import { ShareModalComponent } from '../../../directives/share-modal.component';
+import { MarkdownComponent } from 'ngx-markdown';
 
 @Component({
   selector: 'app-blog',
@@ -29,6 +30,7 @@ import { ShareModalComponent } from '../../../directives/share-modal.component';
     ImageCarouselComponent,
     ImageModalComponent,
     UserInfoModalComponent,
+    MarkdownComponent,
     ShareModalComponent,
     RouterLink,
   ],
@@ -101,6 +103,7 @@ export class BlogComponent implements OnInit {
 
     this.blogService.getPosts().subscribe({
       next: (posts) => {
+
         this.posts.set(posts);
 
         posts.forEach((post) => {

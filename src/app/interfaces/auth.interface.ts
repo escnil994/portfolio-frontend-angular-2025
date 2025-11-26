@@ -1,5 +1,7 @@
+import { User } from './user.interface';
+
 export interface LoginRequest {
-  email: string;
+  identifier: string;
   password: string;
 }
 
@@ -8,24 +10,13 @@ export interface LoginResponse {
   token_type: string;
   requires_2fa: boolean;
   temp_token?: string;
+  user?: User;
+  available_2fa_methods?: string[];
 }
 
 export interface Verify2FARequest {
   temp_token: string;
   code: string;
-}
-
-export interface User {
-  id: number;
-  email: string;
-  username: string;
-  full_name: string | null;
-  is_active: boolean;
-  is_superuser: boolean;
-  email_2fa_enabled: boolean;
-  totp_enabled: boolean;
-  created_at: string;
-  last_login: string | null;
 }
 
 export interface EnableTOTPRequest {
@@ -45,4 +36,11 @@ export interface VerifyTOTPRequest {
 export interface PasswordChangeRequest {
   current_password: string;
   new_password: string;
+}
+
+export interface TokenData {
+  user_id: number;
+  email: string;
+  exp: number;
+  type: string;
 }

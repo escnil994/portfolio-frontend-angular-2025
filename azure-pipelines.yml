@@ -1,0 +1,36 @@
+trigger:
+  branches:
+    include:
+      - deployment
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  - group: GCloud-Variables
+  - name: IMAGE_NAME
+    value: 'gcr.io/personal-portfolio-79ce9/portfolio-ssr'
+
+steps:
+  - script: |
+      echo '$(GCLOUD_SERVICE_KEY)' | base64 -d > ${HOME}/gcloud-key.json
+      gcloud auth activate-service-account --key-file ${HOME}/gcloud-key.json
+      gcloud config set project personal-portfolio-79ce9
+    displayName: 'Authenticate with Google Cloud'
+
+  - script: |
+      gcloud builds submit --tag $(IMAGE_NAME) --timeout=20m
+    displayName: 'Build and Push Docker Image'
+
+  - script: |
+      gcloud run deploy portfolio-ssr \
+        --image $(IMAGE_NAME) \
+        --platform managed \
+        --region us-central1 \
+        --allow-unauthenticated \
+        --min-instances 0 \
+        --max-instances 2 \
+        --memory 512Mi \
+        --cpu 1 \
+        --timeout 60
+    displayName: 'Deploy to Cloud Run'

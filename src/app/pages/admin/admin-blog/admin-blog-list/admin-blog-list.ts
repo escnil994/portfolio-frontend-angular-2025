@@ -26,8 +26,10 @@ export class AdminBlogListComponent implements OnInit {
 
   private loadPosts(): void {
     this.loading.set(true);
-    this.blogService.getPosts(0, 100).subscribe({
+    this.blogService.getPosts().subscribe({
       next: (posts) => {
+        console.log(posts);
+
         this.posts.set(posts);
         this.loading.set(false);
       },

@@ -10,6 +10,8 @@ import { UserInfoModalComponent } from '../../directives/user-info.component';
 import { ShareModalComponent } from '../../directives/share-modal.component';
 import { ImageCarouselComponent } from '../../directives/image-carousel.component';
 import { ImageModalComponent } from '../../directives/image-modal.component';
+import { MarkdownComponent } from 'ngx-markdown';
+
 
 @Component({
   selector: 'app-project-detail',
@@ -22,6 +24,7 @@ import { ImageModalComponent } from '../../directives/image-modal.component';
     ShareModalComponent,
     ImageCarouselComponent,
     ImageModalComponent,
+    MarkdownComponent
   ],
   templateUrl: './project-detail.component.html',
   styleUrl: './project-detail.component.scss'

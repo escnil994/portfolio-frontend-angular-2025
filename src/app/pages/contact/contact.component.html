@@ -1,13 +1,15 @@
-<section class="hero-section relative py-20 overflow-hidden mb-6">
+<section class="hero-section relative py-20 overflow-hidden mb-12">
   <div class="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5"></div>
   <div class="absolute top-10 right-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse-slow"></div>
-  <div class="absolute bottom-10 left-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse-slow" style="animation-delay: 2s;"></div>
+  <div class="absolute bottom-10 left-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse-slow"
+    style="animation-delay: 2s;"></div>
 
   <div class="container mx-auto px-4 relative z-10 text-center">
     <div animateOnScroll>
       <span class="text-accent text-lg font-semibold mb-2 block">Let's Connect</span>
       <h1 class="text-5xl md:text-6xl font-bold mb-4">
-        <span class="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient">
+        <span
+          class="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient">
           Get in Touch
         </span>
       </h1>
@@ -37,14 +39,10 @@
                 <span class="material-icons text-sm">person</span>
                 Name *
               </label>
-              <input
-                type="text"
-                formControlName="name"
-                class="form-input"
-                [class.input-error]="getFieldError('name')"
+              <input type="text" formControlName="name" class="form-input" [class.input-error]="getFieldError('name')"
                 placeholder="John Doe">
               @if (getFieldError('name')) {
-                <span class="error-message">{{ getFieldError('name') }}</span>
+              <span class="error-message">{{ getFieldError('name') }}</span>
               }
             </div>
 
@@ -53,14 +51,10 @@
                 <span class="material-icons text-sm">email</span>
                 Email *
               </label>
-              <input
-                type="email"
-                formControlName="email"
-                class="form-input"
-                [class.input-error]="getFieldError('email')"
-                placeholder="john@example.com">
+              <input type="email" formControlName="email" class="form-input"
+                [class.input-error]="getFieldError('email')" placeholder="john@example.com">
               @if (getFieldError('email')) {
-                <span class="error-message">{{ getFieldError('email') }}</span>
+              <span class="error-message">{{ getFieldError('email') }}</span>
               }
             </div>
 
@@ -69,11 +63,7 @@
                 <span class="material-icons text-sm">subject</span>
                 Subject
               </label>
-              <input
-                type="text"
-                formControlName="subject"
-                class="form-input"
-                placeholder="Project Discussion">
+              <input type="text" formControlName="subject" class="form-input" placeholder="Project Discussion">
             </div>
 
             <div class="form-group">
@@ -81,41 +71,37 @@
                 <span class="material-icons text-sm">message</span>
                 Message *
               </label>
-              <textarea
-                formControlName="message"
-                rows="5"
-                class="form-input"
-                [class.input-error]="getFieldError('message')"
-                placeholder="Tell me about your project..."></textarea>
+              <textarea formControlName="message" rows="5" class="form-input"
+                [class.input-error]="getFieldError('message')" placeholder="Tell me about your project..."></textarea>
               @if (getFieldError('message')) {
-                <span class="error-message">{{ getFieldError('message') }}</span>
+              <span class="error-message">{{ getFieldError('message') }}</span>
               }
             </div>
 
             @if (submitSuccess()) {
-              <div class="alert alert-success">
-                <span class="material-icons">check_circle</span>
-                <div>
-                  <p class="font-semibold">Message sent successfully!</p>
-                  <p class="text-sm">Thank you for reaching out. I'll get back to you soon.</p>
-                </div>
+            <div class="alert alert-success">
+              <span class="material-icons">check_circle</span>
+              <div>
+                <p class="font-semibold">Message sent successfully!</p>
+                <p class="text-sm">Thank you for reaching out. I'll get back to you soon.</p>
               </div>
+            </div>
             }
 
             @if (submitError()) {
-              <div class="alert alert-error">
-                <span class="material-icons">error</span>
-                <span>{{ submitError() }}</span>
-              </div>
+            <div class="alert alert-error">
+              <span class="material-icons">error</span>
+              <span>{{ submitError() }}</span>
+            </div>
             }
 
             <button type="submit" [disabled]="contactForm.invalid || submitting()" class="submit-btn">
               @if (submitting()) {
-                <span class="spinner"></span>
-                Sending...
+              <span class="spinner"></span>
+              Sending...
               } @else {
-                <span class="material-icons mr-2">send</span>
-                Send Message
+              <span class="material-icons mr-2">send</span>
+              Send Message
               }
             </button>
           </form>
@@ -124,18 +110,18 @@
 
       <div class="space-y-6">
         @for (info of contactInfo(); track info.title; let i = $index) {
-          <div animateOnScroll [style.animation-delay.ms]="i * 100 + 100">
-            <a [href]="info.link" target="_blank" class="info-card bg-gradient-to-br {{ info.color }}">
-              <div class="icon-wrapper-large">
-                <span class="material-icons text-4xl">{{ info.icon }}</span>
-              </div>
-              <div class="flex-1">
-                <h3 class="text-xl font-bold mb-1">{{ info.title }}</h3>
-                <p class="text-base-content/70">{{ info.value }}</p>
-              </div>
-              <span class="material-icons text-primary">arrow_forward</span>
-            </a>
-          </div>
+        <div animateOnScroll [style.animation-delay.ms]="i * 100 + 100">
+          <a [href]="info.link" target="_blank" class="info-card bg-gradient-to-br {{ info.color }}">
+            <div class="icon-wrapper-large">
+              <span class="material-icons text-4xl">{{ info.icon }}</span>
+            </div>
+            <div class="flex-1">
+              <h3 class="text-xl font-bold mb-1">{{ info.title }}</h3>
+              <p class="text-base-content/70">{{ info.value }}</p>
+            </div>
+            <span class="material-icons text-primary">arrow_forward</span>
+          </a>
+        </div>
         }
 
         <div animateOnScroll [style.animation-delay.ms]="contactInfo().length * 100 + 200">
@@ -176,7 +162,7 @@
   </div>
 </section>
 
-<section class="section-padding bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 m-6 p-6" animateOnScroll>
+<section class="section-padding bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 p-6 mt-12" animateOnScroll>
   <div class="container mx-auto px-4 text-center">
     <h2 class="text-3xl md:text-4xl font-bold mb-4">Prefer Social Media?</h2>
     <p class="text-lg text-base-content/70 mb-8 max-w-2xl mx-auto">
@@ -184,39 +170,39 @@
     </p>
 
     @if (profile(); as profileData) {
-      <div class="mb-6">
-        <p class="text-xl font-semibold">{{ displayName() }}</p>
-        <p class="text-base-content/70">@{{ profileData.username }}</p>
-      </div>
+    <div class="mb-6">
+      <p class="text-xl font-semibold">{{ displayName() }}</p>
+      <p class="text-base-content/70">@{{ profileData.display_name }}</p>
+    </div>
     }
 
     <div class="flex flex-wrap justify-center gap-4">
       @if (profile()?.github_url) {
-        <a [href]="profile()?.github_url" target="_blank" class="social-btn">
-          <span class="material-icons">code</span>
-          GitHub
-        </a>
+      <a [href]="profile()?.github_url" target="_blank" class="social-btn">
+        <span class="material-icons">code</span>
+        GitHub
+      </a>
       }
 
       @if (profile()?.linkedin_url) {
-        <a [href]="profile()?.linkedin_url" target="_blank" class="social-btn">
-          <span class="material-icons">business</span>
-          LinkedIn
-        </a>
+      <a [href]="profile()?.linkedin_url" target="_blank" class="social-btn">
+        <span class="material-icons">business</span>
+        LinkedIn
+      </a>
       }
 
       @if (profile()?.twitter_url) {
-        <a [href]="profile()?.twitter_url" target="_blank" class="social-btn">
-          <span class="material-icons">alternate_email</span>
-          Twitter
-        </a>
+      <a [href]="profile()?.twitter_url" target="_blank" class="social-btn">
+        <span class="material-icons">alternate_email</span>
+        Twitter
+      </a>
       }
 
       @if (profile()?.email) {
-        <a [href]="'mailto:' + profile()?.email" class="social-btn">
-          <span class="material-icons">email</span>
-          Email
-        </a>
+      <a [href]="'mailto:' + profile()?.email" class="social-btn">
+        <span class="material-icons">email</span>
+        Email
+      </a>
       }
     </div>
   </div>

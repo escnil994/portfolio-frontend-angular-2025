@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AnimateOnScrollDirective } from '../../../../directives/animate-on-scroll.directive';
-import { forkJoin, of } from 'rxjs';
+import { of, lastValueFrom } from 'rxjs';
 import { switchMap, catchError } from 'rxjs/operators';
 import { AdminService } from '../../../../services/admin.service';
 import { ProjectFormData } from '../../../../interfaces/portfolio.interface';
@@ -38,25 +38,20 @@ export class AdminProjectFormComponent implements OnInit {
   readonly submitError = signal<string | null>(null);
   readonly imageError = signal<string | null>(null);
 
-  // Technologies and Tags
   readonly technologies = signal<string[]>([]);
   readonly techInputValue = signal('');
   readonly tags = signal<string[]>([]);
   readonly tagInputValue = signal('');
 
-  // Image slots (max 5)
-  readonly imageSlots = signal<ImageSlot[]>([
-    { file: null, preview: null, uploaded: false },
-    { file: null, preview: null, uploaded: false },
-    { file: null, preview: null, uploaded: false },
-    { file: null, preview: null, uploaded: false },
-    { file: null, preview: null, uploaded: false },
-  ]);
+  readonly imageSlots = signal<ImageSlot[]>(Array(5).fill({ file: null, preview: null, uploaded: false }));
 
   readonly projectForm = this.fb.group({
     title: ['', [Validators.required, Validators.minLength(3)]],
     description: ['', [Validators.required, Validators.minLength(20)]],
+    // Agregamos el campo content al formulario
+    content: [''],
     technologies: ['', Validators.required],
+    slug: ['', [Validators.required, Validators.minLength(3)]],
     tags: [''],
     github_url: [''],
     demo_url: [''],
@@ -66,7 +61,6 @@ export class AdminProjectFormComponent implements OnInit {
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
-
     if (id) {
       this.isEditMode.set(true);
       this.projectId.set(Number(id));
@@ -76,233 +70,166 @@ export class AdminProjectFormComponent implements OnInit {
 
   private loadProject(id: number): void {
     this.loading.set(true);
-
     this.adminService.getProjectForEdit(id).subscribe({
-      next: (project) => {
-        // Populate form
+      next: (project: any) => {
         this.projectForm.patchValue({
           title: project.title,
           description: project.description,
+          content: project.content || '', // Cargar contenido si existe
           technologies: project.technologies || '',
+          slug: project.slug || '',
           tags: project.tags || '',
           github_url: project.github_url || '',
           demo_url: project.demo_url || '',
           featured: project.featured || false,
         });
 
-        // Load technologies
         if (project.technologies) {
-          this.technologies.set(
-            project.technologies
-              .split(',')
-              .map((t: string) => t.trim())
-              .filter((t: string) => t)
-          );
+          this.technologies.set(this.splitAndTrim(project.technologies));
         }
 
-        // Load tags
         if (project.tags) {
-          this.tags.set(
-            project.tags
-              .split(',')
-              .map((t: string) => t.trim())
-              .filter((t: string) => t)
-          );
+          this.tags.set(this.splitAndTrim(project.tags));
         }
 
-        // Load images
-        if (project.images && project.images.length > 0) {
-          const sortedImages = project.images.sort(
-            (a: any, b: any) => a.image_order - b.image_order
-          );
+        if (project.images?.length) {
+          // Crear copia fresca de los slots vacíos
+          const slots: ImageSlot[] = Array(5).fill(null).map(() => ({
+            file: null,
+            preview: null,
+            uploaded: false
+          }));
 
-          const slots = [...this.imageSlots()];
-          sortedImages.forEach((img: any, index: number) => {
-            if (index < 5) {
-              slots[index] = {
-                id: img.id,
-                file: null,
-                preview: img.image_url,
-                uploaded: true,
-              };
-            }
-          });
+          project.images
+            .sort((a: any, b: any) => a.image_order - b.image_order)
+            .forEach((img: any, index: number) => {
+              if (index < 5) {
+                // Asegurarnos de que la URL es válida
+                slots[index] = {
+                  id: img.id,
+                  file: null,
+                  preview: img.image_url, // Asignar URL del backend
+                  uploaded: true
+                };
+              }
+            });
           this.imageSlots.set(slots);
         }
 
-        // Load video URL
-        if (project.videos && project.videos.length > 0) {
-          this.projectForm.patchValue({
-            video_url: project.videos[0].url,
-          });
+        if (project.videos?.length) {
+          this.projectForm.patchValue({ video_url: project.videos[0].url });
         }
-
         this.loading.set(false);
       },
-      error: (error) => {
-        console.error('Error loading project:', error);
+      error: () => {
         this.submitError.set('Failed to load project data');
         this.loading.set(false);
       },
     });
   }
 
-  // Technologies
+  private splitAndTrim(value: string): string[] {
+    return value ? value.split(',').map(t => t.trim()).filter(Boolean) : [];
+  }
+
   onTechInput(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.techInputValue.set(input.value);
+    this.techInputValue.set((event.target as HTMLInputElement).value);
   }
 
   onTechKeydown(event: KeyboardEvent): void {
     if (event.key === 'Enter') {
       event.preventDefault();
-      this.addTechnology();
-    } else if (event.key === 'Backspace' && this.techInputValue() === '') {
-      event.preventDefault();
-      const techs = this.technologies();
-      if (techs.length > 0) {
-        this.removeTechnology(techs[techs.length - 1]);
-      }
+      this.addItem(this.technologies, this.techInputValue, 'technologies');
+    } else if (event.key === 'Backspace' && !this.techInputValue()) {
+      this.removeItem(this.technologies, 'technologies');
     }
   }
 
-  addTechnology(): void {
-    const value = this.techInputValue().trim();
-    if (value && !this.technologies().includes(value)) {
-      this.technologies.set([...this.technologies(), value]);
-      this.updateTechnologiesFormValue();
-      this.techInputValue.set('');
-    }
-  }
-
-  removeTechnology(tech: string): void {
-    this.technologies.set(this.technologies().filter((t) => t !== tech));
-    this.updateTechnologiesFormValue();
-  }
-
-  private updateTechnologiesFormValue(): void {
-    const techString = this.technologies().join(', ');
-    this.projectForm.patchValue({ technologies: techString });
-  }
-
-  focusTechInput(): void {
-    setTimeout(() => this.techInput?.nativeElement.focus(), 0);
-  }
-
-  // Tags
   onTagInput(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.tagInputValue.set(input.value);
+    this.tagInputValue.set((event.target as HTMLInputElement).value);
   }
 
   onTagKeydown(event: KeyboardEvent): void {
     if (event.key === 'Enter') {
       event.preventDefault();
-      this.addTag();
-    } else if (event.key === 'Backspace' && this.tagInputValue() === '') {
-      event.preventDefault();
-      const currentTags = this.tags();
-      if (currentTags.length > 0) {
-        this.removeTag(currentTags[currentTags.length - 1]);
-      }
+      this.addItem(this.tags, this.tagInputValue, 'tags');
+    } else if (event.key === 'Backspace' && !this.tagInputValue()) {
+      this.removeItem(this.tags, 'tags');
     }
   }
 
-  addTag(): void {
-    const value = this.tagInputValue().trim();
-    if (value && !this.tags().includes(value)) {
-      this.tags.set([...this.tags(), value]);
-      this.updateTagsFormValue();
-      this.tagInputValue.set('');
+  private addItem(listSignal: any, inputSignal: any, formControlName: string): void {
+    const value = inputSignal().trim();
+    if (value && !listSignal().includes(value)) {
+      listSignal.update((current: string[]) => [...current, value]);
+      this.projectForm.patchValue({ [formControlName]: listSignal().join(', ') });
+      inputSignal.set('');
     }
+  }
+
+  private removeItem(listSignal: any, formControlName: string, item?: string): void {
+    const current = listSignal();
+    if (item) {
+      listSignal.set(current.filter((t: string) => t !== item));
+    } else if (current.length > 0) {
+      listSignal.set(current.slice(0, -1));
+    }
+    this.projectForm.patchValue({ [formControlName]: listSignal().join(', ') });
+  }
+
+  removeTechnology(tech: string): void {
+    this.removeItem(this.technologies, 'technologies', tech);
   }
 
   removeTag(tag: string): void {
-    this.tags.set(this.tags().filter((t) => t !== tag));
-    this.updateTagsFormValue();
+    this.removeItem(this.tags, 'tags', tag);
   }
 
-  private updateTagsFormValue(): void {
-    const tagString = this.tags().join(', ');
-    this.projectForm.patchValue({ tags: tagString });
-  }
+  focusTechInput(): void { setTimeout(() => this.techInput?.nativeElement.focus(), 0); }
+  focusTagInput(): void { setTimeout(() => this.tagInput?.nativeElement.focus(), 0); }
 
-  focusTagInput(): void {
-    setTimeout(() => this.tagInput?.nativeElement.focus(), 0);
-  }
-
-  // Images
   onImageSelected(event: Event, index: number): void {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-
+    const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
 
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      this.imageError.set('Please select a valid image file');
+    if (!file.type.startsWith('image/') || file.size > 5 * 1024 * 1024) {
+      this.imageError.set(file.size > 5 * 1024 * 1024 ? 'Image must not exceed 5MB' : 'Invalid file type');
       return;
     }
-
-    // Validate file size (max 5MB)
-    const maxSize = 5 * 1024 * 1024;
-    if (file.size > maxSize) {
-      this.imageError.set('Image must not exceed 5MB');
-      return;
-    }
-
     this.imageError.set(null);
 
-    // Create image preview
     const reader = new FileReader();
     reader.onload = (e) => {
       const slots = [...this.imageSlots()];
-      slots[index] = {
-        id: slots[index].id,
-        file: file,
-        preview: e.target?.result as string,
-        uploaded: false,
-      };
+      // Actualizamos el slot específico preservando el resto
+      slots[index] = { ...slots[index], file, preview: e.target?.result as string, uploaded: false };
       this.imageSlots.set(slots);
     };
     reader.readAsDataURL(file);
-
-    input.value = '';
+    (event.target as HTMLInputElement).value = '';
   }
 
   removeImage(index: number): void {
     const slot = this.imageSlots()[index];
-
-    if (slot.uploaded && slot.id && this.projectId()) {
-      this.adminService.deleteProjectImage(this.projectId()!, slot.id).subscribe({
-        next: () => {
-          const slots = [...this.imageSlots()];
-          slots[index] = { file: null, preview: null, uploaded: false };
-          this.imageSlots.set(slots);
-        },
-        error: (error) => {
-          console.error('Error deleting image:', error);
-          this.imageError.set('Failed to delete image');
-        },
-      });
-    } else {
+    const clearSlot = () => {
       const slots = [...this.imageSlots()];
       slots[index] = { file: null, preview: null, uploaded: false };
       this.imageSlots.set(slots);
+    };
+
+    if (slot.uploaded && slot.id && this.projectId()) {
+      this.adminService.deleteProjectImage(this.projectId()!, slot.id).subscribe({
+        next: clearSlot,
+        error: () => this.imageError.set('Failed to delete image'),
+      });
+    } else {
+      clearSlot();
     }
-
-    this.imageError.set(null);
-  }
-
-  private getNewImages(): File[] {
-    return this.imageSlots()
-      .filter((slot) => slot.file !== null && !slot.uploaded)
-      .map((slot) => slot.file!);
   }
 
   onSubmit(): void {
     if (this.projectForm.invalid) {
-      this.markFormGroupTouched(this.projectForm);
+      this.projectForm.markAllAsTouched();
       return;
     }
 
@@ -310,166 +237,73 @@ export class AdminProjectFormComponent implements OnInit {
     this.submitSuccess.set(false);
     this.submitError.set(null);
 
-    const projectData: ProjectFormData = {
-      title: this.projectForm.value.title!,
-      description: this.projectForm.value.description!,
-      technologies: this.projectForm.value.technologies!,
-      tags: this.projectForm.value.tags || undefined,
-      github_url: this.projectForm.value.github_url || undefined,
-      demo_url: this.projectForm.value.demo_url || undefined,
-      featured: this.projectForm.value.featured || false,
+    const formData = this.projectForm.getRawValue();
+
+    // CORRECCIÓN: Incluir 'content' en el objeto que se envía
+    const projectData: any = { // Usamos any temporalmente para permitir campos extra si la interfaz no está al día
+      title: formData.title!,
+      description: formData.description!,
+      content: formData.content || '', // <-- AQUÍ ESTABA FALTANDO
+      technologies: formData.technologies!,
+      slug: formData.slug!,
+      tags: formData.tags || undefined,
+      github_url: formData.github_url || undefined,
+      demo_url: formData.demo_url || undefined,
+      featured: formData.featured || false,
     };
 
-    if (this.isEditMode() && this.projectId()) {
-      this.updateProject(this.projectId()!, projectData);
-    } else {
-      this.createProject(projectData);
-    }
-  }
+    const action$ = this.isEditMode() && this.projectId()
+      ? this.adminService.updateProject(this.projectId()!, projectData)
+      : this.adminService.createProject(projectData);
 
-
-
-  // Por este método:
-private async uploadNewImages(projectId: number): Promise<void> {
-  const slots = this.imageSlots();
-  const uploadPromises: Promise<any>[] = [];
-
-  for (let i = 0; i < slots.length; i++) {
-    const slot = slots[i];
-    if (slot.file && !slot.uploaded) {
-      const promise = this.adminService
-        .uploadProjectImage(projectId, slot.file, i + 1, `Image ${i + 1}`)
-        .toPromise();
-      uploadPromises.push(promise);
-    }
-  }
-
-  if (uploadPromises.length > 0) {
-    await Promise.all(uploadPromises);
-  }
-}
-
-// Actualiza createProject:
-private createProject(projectData: ProjectFormData): void {
-  this.adminService
-    .createProject(projectData)
-    .pipe(
-      switchMap(async (project) => {
-        const projectId = project.id;
-
-        // Upload images
-        await this.uploadNewImages(projectId);
-
-        // Add video
-        const videoUrl = this.projectForm.value.video_url;
-        if (videoUrl) {
-          await this.adminService.addProjectVideo(projectId, {
-            title: projectData.title,
-            url: videoUrl,
-            source: 'youtube'
-          }).toPromise();
-        }
-
+    action$.pipe(
+      switchMap(async (project: any) => {
+        const targetId = this.isEditMode() ? this.projectId()! : project.id;
+        await this.processMedia(targetId, formData.video_url, projectData.title);
         return project;
       }),
       catchError((error) => {
-        this.handleError(error);
+        console.error('Error saving project:', error);
+        this.submitError.set('Failed to save project. Please try again.');
+        this.submitting.set(false);
         return of(null);
       })
-    )
-    .subscribe({
-      next: () => {
-        this.handleSuccess();
-      },
+    ).subscribe((res) => {
+      if (res) {
+        this.submitSuccess.set(true);
+        setTimeout(() => this.router.navigate(['/admin/projects']), 2000);
+      }
     });
-}
-
-// Actualiza updateProject:
-private updateProject(projectId: number, projectData: ProjectFormData): void {
-  this.adminService
-    .updateProject(projectId, projectData)
-    .pipe(
-      switchMap(async () => {
-        // Upload new images
-        await this.uploadNewImages(projectId);
-
-        // Update video if needed
-        const videoUrl = this.projectForm.value.video_url;
-        if (videoUrl) {
-          await this.adminService.addProjectVideo(projectId, {
-            title: projectData.title,
-            url: videoUrl,
-            source: 'youtube'
-          }).toPromise();
-        }
-      }),
-      catchError((error) => {
-        this.handleError(error);
-        return of(null);
-      })
-    )
-    .subscribe({
-      next: () => {
-        this.handleSuccess();
-      },
-    });
-}
-
-  private handleSuccess(): void {
-    this.submitSuccess.set(true);
-    this.submitting.set(false);
-
-    setTimeout(() => {
-      this.router.navigate(['/admin/projects']);
-    }, 2000);
   }
 
-  private handleError(error: any): void {
-    console.error('Error saving project:', error);
-    this.submitError.set(
-      this.isEditMode()
-        ? 'Failed to update project. Please try again.'
-        : 'Failed to create project. Please try again.'
-    );
-    this.submitting.set(false);
+  private async processMedia(projectId: number, videoUrl: string | null | undefined, title: string): Promise<void> {
+    const uploadPromises = this.imageSlots()
+      .map((slot, i) => {
+        if (slot.file && !slot.uploaded) {
+          return lastValueFrom(this.adminService.uploadProjectImage(projectId, slot.file, i + 1, `${title} image ${i + 1}`));
+        }
+        return null;
+      })
+      .filter(Boolean);
+
+    if (uploadPromises.length) await Promise.all(uploadPromises);
+
+    if (videoUrl) {
+      await lastValueFrom(this.adminService.addProjectVideo(projectId, {
+        title,
+        url: videoUrl,
+        source: 'youtube'
+      }));
+    }
   }
 
   getFieldError(fieldName: string): string | null {
     const field = this.projectForm.get(fieldName);
     if (field?.invalid && field?.touched) {
-      if (field.errors?.['required']) {
-        return `${this.getFieldLabel(fieldName)} is required`;
-      }
-      if (field.errors?.['minlength']) {
-        const minLength = field.errors['minlength'].requiredLength;
-        return `${this.getFieldLabel(fieldName)} must be at least ${minLength} characters`;
-      }
+      if (field.errors?.['required']) return 'This field is required';
+      if (field.errors?.['minlength']) return `Min length is ${field.errors['minlength'].requiredLength}`;
     }
     return null;
-  }
-
-  private getFieldLabel(fieldName: string): string {
-    const labels: { [key: string]: string } = {
-      title: 'Title',
-      description: 'Description',
-      technologies: 'Technologies',
-      tags: 'Tags',
-      github_url: 'GitHub URL',
-      demo_url: 'Demo URL',
-      video_url: 'Video URL',
-    };
-    return labels[fieldName] || fieldName;
-  }
-
-  private markFormGroupTouched(formGroup: any): void {
-    Object.keys(formGroup.controls).forEach((key) => {
-      const control = formGroup.get(key);
-      control?.markAsTouched();
-
-      if (control && 'controls' in control) {
-        this.markFormGroupTouched(control);
-      }
-    });
   }
 
   goBack(): void {

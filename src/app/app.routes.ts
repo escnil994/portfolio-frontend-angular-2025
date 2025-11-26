@@ -23,6 +23,10 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/blog/blog-detail-component/blog-detail.component').then(m => m.BlogDetailComponent)
   },
   {
+    path: 'about',
+    loadComponent: () => import('./pages/public-profile/about.component').then(m => m.AboutComponent)
+  },
+  {
     path: 'contact',
     loadComponent: () => import('./pages/contact/contact.component').then(m => m.ContactComponent)
   },

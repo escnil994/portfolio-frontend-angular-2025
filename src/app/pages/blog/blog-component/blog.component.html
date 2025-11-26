@@ -1,5 +1,9 @@
 <div class="min-h-screen bg-base-200">
-  <section class="bg-base-100 py-12 border-b border-base-300">
+  <section class="relative py-20 overflow-hidden">
+
+    <div class="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5"></div>
+    <div class="absolute top-10 left-10 w-64 h-64 bg-primary/10 rounded-full blur-3xl animate-pulse"></div>
+    <div class="absolute bottom-10 right-10 w-80 h-80 bg-accent/10 rounded-full blur-3xl animate-pulse"></div>
     <div class="container mx-auto px-4">
       <div class="max-w-3xl mx-auto text-center">
         <h1 class="text-4xl md:text-5xl font-bold mb-4">
@@ -25,8 +29,19 @@
 
   <section class="py-6">
     <div class="container mx-auto px-4">
+
+         @if (isLoading()) {
+        <div class="flex justify-center items-center min-h-[400px]">
+          <div class="loading loading-spinner loading-lg text-primary"></div>
+        </div>
+      }
+
+
+
       <div class="max-w-3xl mx-auto space-y-4">
         @for (post of filteredPosts; track post.id) {
+
+
         <article class="card bg-base-100 shadow-lg hover:shadow-xl transition-shadow">
 
           <div class="p-4 pb-0">
@@ -34,11 +49,11 @@
               <div class="avatar placeholder">
                 <div
                   class="bg-gradient-to-r from-primary via-accent to-primary rounded-full w-12 h-12 flex items-center justify-center">
-                  <span class="text-bold">{{ post.author.charAt(0) }}</span>
+                  <span class="text-bold">{{ post.author.full_name.charAt(0) }}</span>
                 </div>
               </div>
               <div class="flex-1">
-                <h3 class="font-semibold">{{ post.author }}</h3>
+                <h3 class="font-semibold">{{ post.author.full_name }}</h3>
                 <div class="flex items-center gap-2 text-sm text-base-content/60">
                   <span>{{ post.date | date: 'MMM d, yyyy' }}</span>
                   <span>•</span>
@@ -56,26 +71,7 @@
               </a>
             </h2>
 
-            @if (!isPostExpanded(post.id)) {
-            <p class="text-base-content/70 mb-3 line-clamp-2">
-              {{ post.excerpt }}
-            </p>
-
-            <button (click)="togglePostExpanded(post.id)"
-              class="text-sm font-medium text-primary hover:underline mb-3 inline-flex items-center gap-1">
-              Read more
-              <span class="material-icons text-sm">expand_more</span>
-            </button>
-            }
-          </div>
-
-          @if (isPostExpanded(post.id)) {
-          <div class="px-4 pb-3">
-            <div class="prose prose-sm max-w-none text-base-content/80 mb-4">
-              <p class="whitespace-pre-line">{{ post.content }}</p>
-            </div>
-
-            @if (post.excerpt) {
+               @if (post.excerpt) {
             <div class="bg-gradient-to-r from-primary/5 to-accent/5 border-l-4 border-primary rounded-r-lg p-4 mb-3">
               <div class="flex items-start gap-3">
                 <div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
@@ -92,6 +88,30 @@
               </div>
             </div>
             }
+
+            @if (!isPostExpanded(post.id)) {
+            <p class="text-base-content/70 mb-3 line-clamp-2">
+              {{ post.excerpt }}
+            </p>
+
+            <button (click)="togglePostExpanded(post.id)"
+              class="text-sm font-medium text-primary hover:underline mb-3 inline-flex items-center gap-1">
+              Read more
+              <span class="material-icons text-sm">expand_more</span>
+            </button>
+            }
+          </div>
+
+          @if (isPostExpanded(post.id)) {
+          <div class="px-4 pb-3">
+            <div class="prose prose-sm max-w-none text-base-content/80 mb-4">
+              <p class="whitespace-pre-line">
+                <markdown [data]="post.content"></markdown>
+
+              </p>
+            </div>
+
+
 
             <button (click)="togglePostExpanded(post.id)"
               class="text-sm font-medium text-primary hover:underline inline-flex items-center gap-1">
@@ -152,41 +172,32 @@
 
         <div class="space-y-4">
           <div class="flex flex-col sm:flex-row gap-2 max-w-md mx-auto">
-            <input
-              type="email"
-              [formControl]="subscriptionEmail"
-              class="form-input flex-1"
-              placeholder="Enter your email"
-              (keydown.enter)="onSubscribe()"
-            >
+            <input type="email" [formControl]="subscriptionEmail" class="form-input flex-1"
+              placeholder="Enter your email" (keydown.enter)="onSubscribe()">
 
-            <button
-              type="button"
-              (click)="onSubscribe()"
-              class="submit-btn gap-2"
-            >
+            <button type="button" (click)="onSubscribe()" class="submit-btn gap-2">
               @if (subscriptionLoading()) {
-                <span class="loading loading-spinner loading-sm"></span>
-                <span>Subscribing...</span>
+              <span class="loading loading-spinner loading-sm"></span>
+              <span>Subscribing...</span>
               } @else {
-                <span class="material-icons">send</span>
-                <span>Subscribe</span>
+              <span class="material-icons">send</span>
+              <span>Subscribe</span>
               }
             </button>
           </div>
 
           @if (subscriptionMessage()) {
-            <div role="alert" class="alert alert-success max-w-md mx-auto">
-              <span class="material-icons">check_circle</span>
-              <span>{{ subscriptionMessage() }}</span>
-            </div>
+          <div role="alert" class="alert alert-success max-w-md mx-auto">
+            <span class="material-icons">check_circle</span>
+            <span>{{ subscriptionMessage() }}</span>
+          </div>
           }
 
           @if (subscriptionError()) {
-            <div role="alert" class="alert alert-error max-w-md mx-auto">
-              <span class="material-icons">error_outline</span>
-              <span>{{ subscriptionError() }}</span>
-            </div>
+          <div role="alert" class="alert alert-error max-w-md mx-auto">
+            <span class="material-icons">error_outline</span>
+            <span>{{ subscriptionError() }}</span>
+          </div>
           }
         </div>
 

@@ -1,5 +1,3 @@
-// project.service.ts - NUEVO ARCHIVO
-
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -11,7 +9,6 @@ import {
   Comment,
   CommentCreate,
   ReactionSummary,
-  Image
 } from '../interfaces/portfolio.interface';
 import { ReactionType } from '../enums/reaction-type.enum';
 import { environment } from '../../environments/environment';
@@ -22,8 +19,8 @@ import { environment } from '../../environments/environment';
 export class ProjectService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrl}/projects`;
+  private readonly reactionsUrl = `${environment.apiUrl}/reactions/project`;
 
-  // Get all projects
   getProjects(skip: number = 0, limit: number = 100, featured?: boolean): Observable<ProjectUI[]> {
     let params = new HttpParams()
       .set('skip', skip.toString())
@@ -38,14 +35,12 @@ export class ProjectService {
     );
   }
 
-  // Get single project with details
   getProject(id: number): Observable<ProjectUI> {
     return this.http.get<ProjectWithDetails>(`${this.apiUrl}/${id}`).pipe(
       map(proj => this.mapProjectToUI(proj))
     );
   }
 
-  // Comments
   addComment(projectId: number, comment: CommentCreate): Observable<Comment> {
     return this.http.post<Comment>(`${this.apiUrl}/${projectId}/comments`, comment);
   }
@@ -56,16 +51,11 @@ export class ProjectService {
     );
   }
 
-  // Reactions
   addReaction(
     projectId: number,
     reactionData: { email: string; name: string; reaction_type: ReactionType }
   ): Observable<any> {
-
-    return this.http.post(
-      `${environment.apiUrl}/reactions/project/${projectId}`,
-      reactionData
-    );
+    return this.http.post(`${this.reactionsUrl}/${projectId}`, reactionData);
   }
 
   getReactions(projectId: number, userEmail?: string): Observable<ReactionSummary> {
@@ -73,24 +63,20 @@ export class ProjectService {
     if (userEmail) {
       params = params.set('user_email', userEmail);
     }
-    return this.http.get<ReactionSummary>(
-      `${environment.apiUrl}/reactions/project/${projectId}/summary`,
-      { params }
-    );
+    return this.http.get<ReactionSummary>(`${this.reactionsUrl}/${projectId}/summary`, { params });
   }
 
   deleteReaction(projectId: number, email: string): Observable<void> {
-    return this.http.delete<void>(
-      `${environment.apiUrl}/reactions/project/${projectId}`,
-      { params: { email } }
-    );
+    return this.http.delete<void>(`${this.reactionsUrl}/${projectId}`, { params: { email } });
   }
 
-  // Helper methods
   private mapProjectToUI(proj: Project | ProjectWithDetails): ProjectUI {
-    const imageUrls = proj.images
-      ?.sort((a, b) => a.image_order - b.image_order)
-      .map(img => img.image_url) || [];
+    // Protección contra nulos en images
+    const rawImages = proj.images || [];
+
+    const imageUrls = rawImages
+      .sort((a, b) => a.image_order - b.image_order)
+      .map(img => img.image_url);
 
     const category = this.detectCategory(proj.technologies || '');
 
@@ -98,8 +84,9 @@ export class ProjectService {
       id: proj.id,
       title: proj.title,
       description: proj.description,
-      image: imageUrls[0] || 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&q=80',
-      images: imageUrls.length > 0 ? imageUrls : [],
+      content: proj.content || '',
+      image: imageUrls[0] || 'assets/placeholder-project.jpg', // Imagen por defecto si no hay
+      images: imageUrls,
       featured: proj.featured,
       technologies: proj.technologies ? proj.technologies.split(',').map(t => t.trim()) : [],
       githubUrl: proj.github_url || undefined,
@@ -107,7 +94,6 @@ export class ProjectService {
       category
     };
 
-    // Add details if available (for detail view)
     if ('comments' in proj) {
       projectUI.comments = proj.comments || [];
       projectUI.comments_count = proj.comments?.length || 0;
@@ -125,24 +111,8 @@ export class ProjectService {
 
   private detectCategory(techString: string): string {
     const tech = techString.toLowerCase();
-
-    if (tech.includes('docker') || tech.includes('kubernetes') ||
-        tech.includes('jenkins') || tech.includes('ci/cd') ||
-        tech.includes('ansible') || tech.includes('terraform')) {
-      return 'devops';
-    }
-
-    if (tech.includes('aws') || tech.includes('azure') ||
-        tech.includes('gcp') || tech.includes('cloud')) {
-      return 'cloud';
-    }
-
+    if (tech.includes('docker') || tech.includes('kubernetes') || tech.includes('ansible')) return 'devops';
+    if (tech.includes('aws') || tech.includes('azure') || tech.includes('gcp')) return 'cloud';
     return 'web';
-  }
-
-  private extractYouTubeId(url: string): string | null {
-    const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
-    const match = url.match(regExp);
-    return (match && match[7].length === 11) ? match[7] : null;
   }
 }

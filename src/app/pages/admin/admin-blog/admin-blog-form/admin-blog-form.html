@@ -26,252 +26,227 @@
 
 <!-- Loading State -->
 @if (loading()) {
-  <section class="section-padding">
-    <div class="container mx-auto px-4 max-w-5xl">
-      <div class="flex justify-center items-center min-h-[400px]">
-        <div class="text-center">
-          <span class="loading loading-spinner loading-lg text-primary"></span>
-          <p class="text-base-content/60 mt-4">Loading post data...</p>
-        </div>
+<section class="section-padding">
+  <div class="container mx-auto px-4 max-w-5xl">
+    <div class="flex justify-center items-center min-h-[400px]">
+      <div class="text-center">
+        <span class="loading loading-spinner loading-lg text-primary"></span>
+        <p class="text-base-content/60 mt-4">Loading post data...</p>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 }
 
 <!-- Form Section -->
 @if (!loading()) {
-  <section class="section-padding">
-    <div class="container mx-auto px-4 max-w-5xl">
-      <form [formGroup]="postForm" (ngSubmit)="onSubmit()">
+<section class="section-padding">
+  <div class="container mx-auto px-4 max-w-5xl">
+    <form [formGroup]="postForm" (ngSubmit)="onSubmit()">
 
-        <!-- Post Details Card -->
-        <div class="project-card" animateOnScroll>
-          <div class="flex items-center gap-3 mb-6">
-            <div class="icon-wrapper">
-              <span class="material-icons text-3xl text-primary">article</span>
-            </div>
-            <h2 class="text-3xl font-bold">Post Details</h2>
+      <!-- CARD: POST DETAILS -->
+      <div class="project-card" animateOnScroll>
+        <div class="flex items-center gap-3 mb-6">
+          <div class="icon-wrapper">
+            <span class="material-icons text-3xl text-primary">article</span>
+          </div>
+          <h2 class="text-3xl font-bold">Post Details</h2>
+        </div>
+
+        <div class="flex flex-col gap-6">
+
+          <!-- Title -->
+          <div class="form-control w-full">
+            <label class="form-label">
+              <span class="material-icons text-sm">title</span>
+              Post Title *
+            </label>
+            <input
+              type="text"
+              formControlName="title"
+              class="form-input"
+              [class.input-error]="getFieldError('title')"
+              placeholder="My Amazing Blog Post">
+            @if (getFieldError('title')) {
+            <span class="error-message">{{ getFieldError('title') }}</span>
+            }
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Title -->
-            <div class="form-group md:col-span-2">
-              <label class="form-label">
-                <span class="material-icons text-sm">title</span>
-                Post Title *
-              </label>
-              <input
-                type="text"
-                formControlName="title"
-                class="form-input"
-                [class.input-error]="getFieldError('title')"
-                placeholder="My Amazing Blog Post">
-              @if (getFieldError('title')) {
-                <span class="error-message">{{ getFieldError('title') }}</span>
-              }
-            </div>
+          <!-- Slug -->
+          <div class="form-control w-full">
+            <label class="form-label">
+              <span class="material-icons text-sm">link</span>
+              Slug *
+            </label>
+            <input
+              type="text"
+              formControlName="slug"
+              class="form-input"
+              [class.input-error]="getFieldError('slug')"
+              placeholder="my-amazing-blog-post">
+            @if (getFieldError('slug')) {
+            <span class="error-message">{{ getFieldError('slug') }}</span>
+            }
+          </div>
 
-            <!-- Slug -->
-            <div class="form-group md:col-span-2">
-              <label class="form-label">
-                <span class="material-icons text-sm">link</span>
-                Slug *
-              </label>
-              <input
-                type="text"
-                formControlName="slug"
-                class="form-input"
-                [class.input-error]="getFieldError('slug')"
-                placeholder="my-amazing-blog-post">
-              @if (getFieldError('slug')) {
-                <span class="error-message">{{ getFieldError('slug') }}</span>
-              }
-            </div>
 
-            <!-- Author -->
-            <div class="form-group md:col-span-2">
-              <label class="form-label">
-                <span class="material-icons text-sm">person</span>
-                Author *
-              </label>
-              <input
-                type="text"
-                formControlName="author"
-                class="form-input"
-                [class.input-error]="getFieldError('author')"
-                placeholder="John Doe">
-              @if (getFieldError('author')) {
-                <span class="error-message">{{ getFieldError('author') }}</span>
-              }
-            </div>
 
-            <!-- Excerpt -->
-            <div class="form-group md:col-span-2">
-              <label class="form-label">
-                <span class="material-icons text-sm">short_text</span>
-                Excerpt *
-              </label>
-              <textarea
-                formControlName="excerpt"
-                rows="3"
-                class="form-input"
-                [class.input-error]="getFieldError('excerpt')"
-                placeholder="Brief description of the post..."></textarea>
-              @if (getFieldError('excerpt')) {
-                <span class="error-message">{{ getFieldError('excerpt') }}</span>
-              }
-            </div>
+          <!-- Excerpt -->
+          <div class="form-control w-full">
+            <label class="form-label">
+              <span class="material-icons text-sm">short_text</span>
+              Excerpt *
+            </label>
+            <textarea
+              formControlName="excerpt"
+              rows="3"
+              class="form-input"
+              [class.input-error]="getFieldError('excerpt')"
+              placeholder="Brief description of the post..."></textarea>
+            @if (getFieldError('excerpt')) {
+            <span class="error-message">{{ getFieldError('excerpt') }}</span>
+            }
+          </div>
 
-            <!-- Content -->
-            <div class="form-group md:col-span-2">
-              <label class="form-label">
-                <span class="material-icons text-sm">description</span>
-                Content *
-              </label>
-              <textarea
-                formControlName="content"
-                rows="10"
-                class="form-input"
-                [class.input-error]="getFieldError('content')"
-                placeholder="Write your blog post content here..."></textarea>
-              @if (getFieldError('content')) {
-                <span class="error-message">{{ getFieldError('content') }}</span>
-              }
-            </div>
+          <!-- Content -->
+          <div class="form-control w-full">
+            <label class="form-label">
+              <span class="material-icons text-sm">description</span>
+              Content *
+            </label>
+            <textarea
+              formControlName="content"
+              rows="10"
+              class="form-input"
+              [class.input-error]="getFieldError('content')"
+              placeholder="Write your blog post content here..."></textarea>
+            @if (getFieldError('content')) {
+            <span class="error-message">{{ getFieldError('content') }}</span>
+            }
+          </div>
 
-            <!-- Tags -->
-            <div class="form-group md:col-span-2">
-              <label class="form-label">
-                <span class="material-icons text-sm">label</span>
-                Tags
-                <span class="text-sm text-base-content/60 font-normal ml-auto">Optional</span>
-              </label>
-              <div class="tags-input-wrapper" (click)="focusTagInput()">
+          <!-- Tags -->
+          <div class="form-control w-full">
+            <label class="form-label">
+              <span class="material-icons text-sm">label</span>
+              Tags
+              <span class="text-sm text-base-content/60 font-normal ml-auto">Optional</span>
+            </label>
+            <div class="form-input focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20" (click)="focusTagInput()">
+              <div class="flex flex-wrap items-center gap-2">
                 @for (tag of tags(); track tag) {
-                  <div class="tag-item">
-                    <span class="tag-text">{{ tag }}</span>
-                    <button type="button"
-                            class="tag-remove"
-                            (click)="removeTag(tag)"
-                            [attr.aria-label]="'Remove ' + tag">
-                      <span class="material-icons">close</span>
-                    </button>
-                  </div>
+                <div class="badge gap-2" style="background-color: var(--btn-color, oklch(var(--p))); color: var(--btn-text-color, oklch(var(--pc)));">
+                  <span>{{ tag }}</span>
+                  <span class="cursor-pointer hover:opacity-70" (click)="removeTag(tag)"
+                    [attr.aria-label]="'Remove ' + tag">
+                    <span class="material-icons text-sm">close</span>
+                  </span>
+                </div>
                 }
                 <input
                   #tagInput
                   type="text"
-                  class="tag-input"
+                  class="flex-1 bg-transparent focus:outline-none min-w-[150px] h-auto p-0"
                   [value]="tagInputValue()"
                   (input)="onTagInput($event)"
                   (keydown)="onTagKeydown($event)"
                   placeholder="Type and press Enter">
               </div>
-              <span class="tags-hint">Press Enter to add each tag</span>
             </div>
+            <span class="tags-hint">Press Enter to add each tag</span>
+          </div>
 
-            <!-- Video URL -->
-            <div class="form-group md:col-span-2">
-              <label class="form-label">
-                <span class="material-icons text-sm">play_circle</span>
-                Video URL
-              </label>
-              <input
-                type="url"
-                formControlName="video_url"
-                class="form-input"
-                placeholder="https://www.youtube.com/watch?v=...">
-              <span class="tags-hint">Add a YouTube video (optional)</span>
-            </div>
+          <!-- Video URL -->
+          <div class="form-control w-full">
+            <label class="form-label">
+              <span class="material-icons text-sm">play_circle</span>
+              Video URL
+            </label>
+            <input
+              type="url"
+              formControlName="video_url"
+              class="form-input"
+              placeholder="https://www.youtube.com/watch?v=...">
+            <span class="tags-hint">Add a YouTube video (optional)</span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- CARD: IMAGE GALLERY -->
+      <div class="project-card" animateOnScroll [style.animation-delay.ms]="100">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="icon-wrapper">
+            <span class="material-icons text-3xl text-info">collections</span>
+          </div>
+          <div class="flex-1">
+            <h2 class="text-3xl font-bold">Image Gallery</h2>
+            <p class="text-base-content/70 text-sm mt-1">
+              Upload up to 5 images. The first image will be the featured image.
+            </p>
           </div>
         </div>
 
-        <!-- Image Gallery Card -->
-        <div class="project-card" animateOnScroll [style.animation-delay.ms]="100">
-          <div class="flex items-center gap-3 mb-6">
-            <div class="icon-wrapper">
-              <span class="material-icons text-3xl text-info">collections</span>
-            </div>
-            <div class="flex-1">
-              <h2 class="text-3xl font-bold">Image Gallery</h2>
-              <p class="text-base-content/70 text-sm mt-1">
-                Upload up to 5 images. The first image will be the featured image.
-              </p>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-            @for (slot of imageSlots(); track $index) {
-              <div class="image-upload-slot" [class.has-image]="slot.preview">
-                @if (slot.preview) {
-                  <!-- Image Preview -->
-                  <div class="image-preview-wrapper">
-                    <img [src]="slot.preview" alt="Preview" class="image-preview">
-                    <div class="image-overlay">
-                      <button
-                        type="button"
-                        class="image-action-btn delete-btn"
-                        (click)="removeImage($index)">
-                        <span class="material-icons">delete</span>
-                      </button>
-                    </div>
-                    @if ($index === 0) {
-                      <div class="primary-badge">
-                        <span class="material-icons text-xs">star</span>
-                        Featured
-                      </div>
-                    }
-                  </div>
-                } @else {
-                  <!-- Upload Button -->
-                  <label class="image-upload-label">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      (change)="onImageSelected($event, $index)"
-                      class="hidden">
-                    <div class="upload-content">
-                      <span class="material-icons text-4xl text-base-content/40 mb-2">add_photo_alternate</span>
-                      <p class="text-xs text-base-content/60 text-center">
-                        @if ($index === 0) {
-                          Featured Image
-                        } @else {
-                          Add Image
-                        }
-                      </p>
-                    </div>
-                  </label>
-                }
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          @for (slot of imageSlots(); track $index) {
+          <div
+            class="aspect-square rounded-lg border-2 border-dashed border-base-300/40 relative flex items-center justify-center">
+            @if (slot.preview) {
+            <div class="relative group h-full w-full">
+              <img [src]="slot.preview" alt="Preview" class="object-cover h-full w-full rounded-lg">
+              <div
+                class="absolute inset-0 bg-neutral/70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
+                <button type="button" class="btn btn-error btn-sm btn-circle" (click)="removeImage($index)">
+                  <span class="material-icons">delete</span>
+                </button>
               </div>
+              @if ($index === 0) {
+              <div class="badge badge-primary badge-sm absolute top-2 left-2 z-10">
+                <span class="material-icons text-xs">star</span>
+                Featured
+              </div>
+              }
+            </div>
+            } @else {
+            <label
+              class="absolute inset-0 flex flex-col items-center justify-center cursor-pointer p-2 hover:bg-base-200/50 rounded-lg transition-colors">
+              <input type="file" accept="image/*" (change)="onImageSelected($event, $index)" class="hidden">
+              <div class="text-center">
+                <span class="material-icons text-4xl text-base-content/40 mb-1">add_photo_alternate</span>
+                <p class="text-xs text-base-content/60 font-medium">
+                  @if ($index === 0) {
+                  Featured Image
+                  } @else {
+                  Add Image
+                  }
+                </p>
+              </div>
+            </label>
             }
           </div>
-
-          @if (imageError()) {
-            <div class="alert alert-error mt-4">
-              <span class="material-icons">error</span>
-              <span>{{ imageError() }}</span>
-            </div>
           }
         </div>
 
-        <!-- Post Options Card -->
-        <div class="project-card" animateOnScroll [style.animation-delay.ms]="200">
-          <div class="flex items-center gap-3 mb-6">
-            <div class="icon-wrapper">
-              <span class="material-icons text-3xl text-warning">settings</span>
-            </div>
-            <h2 class="text-3xl font-bold">Post Options</h2>
-          </div>
+        @if (imageError()) {
+        <div class="alert alert-error mt-4">
+          <span class="material-icons">error</span>
+          <span>{{ imageError() }}</span>
+        </div>
+        }
+      </div>
 
-          <div class="featured-toggle">
-            <label class="toggle-label">
-              <input
-                type="checkbox"
-                formControlName="published"
-                class="toggle-input">
-              <span class="toggle-slider"></span>
-            </label>
-            <div class="toggle-content">
+      <!-- CARD: POST OPTIONS -->
+      <div class="project-card" animateOnScroll [style.animation-delay.ms]="200">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="icon-wrapper">
+            <span class="material-icons text-3xl text-warning">settings</span>
+          </div>
+          <h2 class="text-3xl font-bold">Post Options</h2>
+        </div>
+
+        <div class="form-control w-full">
+          <label class="label cursor-pointer p-0">
+            <div class="flex-1 pr-4">
               <div class="flex items-center gap-2 mb-1">
                 <span class="material-icons text-success">publish</span>
                 <span class="font-semibold">Publish Post</span>
@@ -280,53 +255,49 @@
                 Published posts are visible to all visitors.
               </p>
             </div>
-          </div>
+            <input type="checkbox" formControlName="published" class="toggle toggle-primary" />
+          </label>
         </div>
+      </div>
 
-        <!-- Success Message -->
-        @if (submitSuccess()) {
-          <div class="alert alert-success" animateOnScroll>
-            <span class="material-icons">check_circle</span>
-            <div>
-              <p class="font-semibold">
-                {{ isEditMode() ? 'Post updated successfully!' : 'Post created successfully!' }}
-              </p>
-              <p class="text-sm">The post has been saved correctly.</p>
-            </div>
-          </div>
-        }
-
-        <!-- Error Message -->
-        @if (submitError()) {
-          <div class="alert alert-error" animateOnScroll>
-            <span class="material-icons">error</span>
-            <span>{{ submitError() }}</span>
-          </div>
-        }
-
-        <!-- Form Actions -->
-        <div class="form-actions" animateOnScroll [style.animation-delay.ms]="300">
-          <button
-            type="button"
-            (click)="goBack()"
-            class="cancel-btn">
-            <span class="material-icons mr-2">arrow_back</span>
-            Cancel
-          </button>
-          <button
-            type="submit"
-            [disabled]="postForm.invalid || submitting()"
-            class="submit-btn">
-            @if (submitting()) {
-              <span class="loading loading-spinner loading-sm"></span>
-              Saving...
-            } @else {
-              <span class="material-icons mr-2">{{ isEditMode() ? 'save' : 'add' }}</span>
-              {{ isEditMode() ? 'Save Changes' : 'Create Post' }}
-            }
-          </button>
+      <!-- MENSAJES DE ESTADO -->
+      @if (submitSuccess()) {
+      <div class="alert alert-success mt-8" animateOnScroll>
+        <span class="material-icons">check_circle</span>
+        <div>
+          <p class="font-semibold">
+            {{ isEditMode() ? 'Post updated successfully!' : 'Post created successfully!' }}
+          </p>
+          <p class="text-sm">The post has been saved correctly.</p>
         </div>
-      </form>
-    </div>
-  </section>
+      </div>
+      }
+
+      @if (submitError()) {
+      <div class="alert alert-error mt-8" animateOnScroll>
+        <span class="material-icons">error</span>
+        <span>{{ submitError() }}</span>
+      </div>
+      }
+
+      <!-- BOTONES DE ACCIÓN -->
+      <div class="flex flex-wrap justify-between items-center gap-4 mt-8" animateOnScroll
+        [style.animation-delay.ms]="300">
+        <button type="button" (click)="goBack()" class="cancel-btn">
+          <span class="material-icons mr-2">arrow_back</span>
+          Cancel
+        </button>
+        <button type="submit" [disabled]="postForm.invalid || submitting()" class="submit-btn">
+          @if (submitting()) {
+          <span class="loading loading-spinner loading-sm"></span>
+          Saving...
+          } @else {
+          <span class="material-icons mr-2">{{ isEditMode() ? 'save' : 'add' }}</span>
+          {{ isEditMode() ? 'Save Changes' : 'Create Post' }}
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+</section>
 }

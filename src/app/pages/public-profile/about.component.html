@@ -1,0 +1,339 @@
+@if (loading()) {
+  <div class="min-h-screen flex justify-center items-center hero-section relative py-8 md:py-12 overflow-hidden mb-0">
+    <span class="loading loading-spinner loading-lg text-primary"></span>
+  </div>
+} @else if (profile()) {
+
+<section class="hero-section relative py-8 md:py-12 overflow-hidden mb-0">
+    <div class="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5"></div>
+    <div class="absolute top-20 right-20 w-96 h-96 bg-primary/10 rounded-full blur-[100px] animate-pulse-slow"></div>
+    <div class="absolute bottom-20 left-20 w-80 h-80 bg-accent/10 rounded-full blur-[100px] animate-pulse-slow" style="animation-delay: 2s;"></div>
+
+    <div class="container mx-auto px-4 relative z-10 text-center max-w-7xl">
+      <div class="flex flex-col items-center justify-center gap-12 md:gap-16">
+
+        <div class="flex-1 text-center w-full md:w-4/5" animateOnScroll style="animation-delay: 100ms;">
+          <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent text-xs font-bold mb-6 border border-accent/20 tracking-widest">
+            <span class="w-2 h-2 rounded-full bg-accent animate-pulse"></span>
+            PROFESSIONAL PROFILE
+          </div>
+
+          <h1 class="text-4xl md:text-6xl font-bold mb-4 tracking-tight leading-tight">
+            <span class="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient">
+              {{ fullName() }}
+            </span>
+          </h1>
+
+          @if (profile()!.title) {
+            <p class="text-lg md:text-xl text-primary font-semibold mb-6">
+              {{ profile()!.title }}
+            </p>
+          }
+
+          <p class="text-base-content/70 text-base md:text-lg leading-relaxed mb-10 max-w-4xl mx-auto whitespace-pre-line">
+            {{ profile()!.bio }}
+          </p>
+
+          <div class="flex flex-wrap justify-center gap-3">
+            @if (profile()!.github_url) {
+              <a [href]="profile()!.github_url" target="_blank" rel="noopener" class="social-hero-btn">
+                <i class="devicon-github-original text-lg"></i>
+                GitHub
+              </a>
+            }
+            @if (profile()!.linkedin_url) {
+              <a [href]="profile()!.linkedin_url" target="_blank" rel="noopener" class="social-hero-btn">
+                <i class="devicon-linkedin-plain text-lg"></i>
+                LinkedIn
+              </a>
+            }
+
+
+            @if (profile()!.resume_url) {
+              <a [href]="profile()!.resume_url" target="_blank" rel="noopener" class="social-hero-btn">
+                <i class="devicon-linkedin-plain text-lg"></i>
+                Resume
+              </a>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-10 md:py-16 bg-base-100/50 -mt-6">
+    <div class="container mx-auto px-4 max-w-7xl">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
+
+        <div class="lg:col-span-1 space-y-6">
+
+          @if (parsedSkills().length > 0) {
+            <div class="about-card h-auto" animateOnScroll>
+              <div class="flex items-center gap-3 mb-6">
+                <div class="icon-wrapper">
+                  <span class="material-icons">psychology</span>
+                </div>
+                <h2 class="text-2xl font-bold">Skills</h2>
+              </div>
+
+              <div class="flex flex-wrap gap-2">
+                @for (skill of parsedSkills(); track skill.name) {
+                  <div class="skill-pill">
+                    @if (skill.icon) {
+                      <span class="material-icons text-sm">{{ skill.icon }}</span>
+                    }
+                    {{ skill.name }}
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          <div class="about-card h-auto" animateOnScroll style="animation-delay: 100ms;">
+            <div class="flex items-center gap-3 mb-6">
+              <div class="icon-wrapper bg-gradient-to-br from-accent to-[#0891d4]">
+                <span class="material-icons">info</span>
+              </div>
+              <h2 class="text-2xl font-bold">Quick Info</h2>
+            </div>
+
+            <div class="space-y-3">
+              @if (profile()!.email) {
+                <div class="flex items-center gap-3 p-3 rounded-lg hover:bg-base-200/50 transition-colors">
+                  <div class="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center text-primary flex-shrink-0">
+                    <span class="material-icons text-lg">email</span>
+                  </div>
+                  <div class="min-w-0">
+                    <p class="text-xs text-base-content/50 uppercase font-bold tracking-wider">Email</p>
+                    <p class="text-sm font-medium truncate" [title]="profile()!.email">{{ profile()!.email }}</p>
+                  </div>
+                </div>
+              }
+              <div class="flex items-center gap-3 p-3 rounded-lg hover:bg-base-200/50 transition-colors">
+                <div class="w-10 h-10 rounded-lg bg-accent/20 flex items-center justify-center text-accent flex-shrink-0">
+                  <span class="material-icons text-lg">check_circle</span>
+                </div>
+                <div>
+                  <p class="text-xs text-base-content/50 uppercase font-bold tracking-wider">Status</p>
+                  <p class="text-sm font-medium text-success">Available for projects</p>
+                </div>
+              </div>
+              @if (profile()!.twitter_url) {
+                <a [href]="profile()!.twitter_url" target="_blank" class="flex items-center gap-3 p-3 rounded-lg hover:bg-base-200/50 transition-colors no-underline text-current">
+                   <div class="w-10 h-10 rounded-lg bg-base-200/50 flex items-center justify-center text-base-content/60 flex-shrink-0">
+                    <span class="devicon-twitter-original text-lg"></span>
+                  </div>
+                  <div class="min-w-0">
+                    <p class="text-xs text-base-content/50 uppercase font-bold tracking-wider">Social</p>
+                    <p class="text-sm font-medium">Twitter / X</p>
+                  </div>
+                </a>
+              }
+            </div>
+          </div>
+
+          @if (parsedAchievements().length > 0) {
+            <div class="about-card h-auto" animateOnScroll style="animation-delay: 150ms;">
+              <div class="flex items-center gap-3 mb-6">
+                <div class="icon-wrapper bg-gradient-to-br from-yellow-500 to-amber-600">
+                  <span class="material-icons">emoji_events</span>
+                </div>
+                <h2 class="text-2xl font-bold">Key Achievements</h2>
+              </div>
+
+              <div class="space-y-4">
+                @for (ach of parsedAchievements(); track ach.title) {
+                  <div class="p-3 bg-base-200/30 rounded-lg border border-base-300/50">
+                     <h4 class="font-bold text-sm">{{ ach.title }}</h4>
+                     <p class="text-xs text-base-content/70 mt-1">{{ ach.description }}</p>
+                     <span class="text-[10px] font-bold text-primary mt-2 block">{{ ach.date }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          <div class="about-card card-highlight text-center" animateOnScroll style="animation-delay: 200ms;">
+            <div class="icon-wrapper wrapper-lg mx-auto mb-4 rounded-full">
+              <span class="material-icons">rocket_launch</span>
+            </div>
+            <h3 class="text-xl font-bold mb-3">Let's Collaborate</h3>
+            <p class="text-base-content/70 text-sm mb-6 leading-relaxed">
+              Ready to turn your ideas into reality? I'm just a message away.
+            </p>
+            <a routerLink="/contact" class="btn-cta btn-cta-primary w-full text-sm py-3 justify-center no-underline">
+              Contact Me
+            </a>
+          </div>
+
+        </div>
+
+        <div class="lg:col-span-2 space-y-10">
+
+          <section animateOnScroll style="animation-delay: 100ms;">
+            <div class="flex items-center gap-4 mb-8">
+              <div class="icon-wrapper wrapper-lg">
+                <span class="material-icons">work_history</span>
+              </div>
+              <div>
+                <h2 class="text-3xl font-bold">Experience</h2>
+                <p class="text-base-content/60 text-sm mt-1">Professional journey</p>
+              </div>
+            </div>
+
+            @if (parsedExperience().length > 0) {
+              <div class="space-y-4">
+                @for (job of parsedExperience(); track job.company; let i = $index) {
+                  <div class="timeline-item" animateOnScroll [style.animation-delay]="(i * 50) + 'ms'">
+                    <div class="about-card mb-0 hover:-translate-y-1 transition-transform">
+                      <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-3">
+                        <div>
+                          <h3 class="text-lg font-bold text-base-content">{{ job.role }}</h3>
+                          <div class="flex items-center gap-2 text-primary font-medium mt-2">
+                            <span class="material-icons text-base">business</span>
+                            {{ job.company }}
+                          </div>
+                        </div>
+                        <span class="px-3 py-1 rounded-lg bg-base-200 text-xs font-bold border border-base-300 whitespace-nowrap self-start md:self-auto">
+                          {{ job.period }}
+                        </span>
+                      </div>
+                      <p class="text-base-content/70 text-sm leading-relaxed whitespace-pre-line">
+                        {{ job.description }}
+                      </p>
+                    </div>
+                  </div>
+                }
+              </div>
+            } @else {
+              <div class="about-card flex flex-col items-center justify-center py-16 text-center">
+                <span class="material-icons text-5xl mb-3 text-base-content/20">work_outline</span>
+                <p class="text-base-content/50">No work experience added yet.</p>
+              </div>
+            }
+          </section>
+
+          <section animateOnScroll style="animation-delay: 200ms;">
+            <div class="flex items-center gap-4 mb-8">
+              <div class="icon-wrapper wrapper-lg bg-gradient-to-br from-accent to-[#0891d4]">
+                <span class="material-icons">school</span>
+              </div>
+              <div>
+                <h2 class="text-3xl font-bold">Education</h2>
+                <p class="text-base-content/60 text-sm mt-1">Academic background</p>
+              </div>
+            </div>
+
+            @if (parsedEducation().length > 0) {
+              <div class="space-y-4">
+                @for (edu of parsedEducation(); track edu.degree; let i = $index) {
+                  <div class="about-card" animateOnScroll [style.animation-delay]="(i * 50 + 100) + 'ms'">
+                    <div class="flex gap-4">
+                      <div class="w-14 h-14 rounded-xl bg-accent/20 flex items-center justify-center border border-accent/30 flex-shrink-0">
+                        <span class="material-icons text-2xl text-accent">workspace_premium</span>
+                      </div>
+                      <div class="flex-1 min-w-0">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
+                          <h3 class="text-lg font-bold">{{ edu.degree }}</h3>
+                          <span class="text-xs font-bold text-accent px-3 py-1 bg-accent/10 rounded-full whitespace-nowrap">
+                            {{ edu.period }}
+                          </span>
+                        </div>
+                        <p class="text-base-content/80 font-medium mb-2 flex items-center gap-2 text-sm">
+                          <span class="material-icons text-sm">account_balance</span>
+                          {{ edu.institution }}
+                        </p>
+                        @if(edu.description) {
+                            <p class="text-base-content/60 text-sm leading-relaxed">
+                            {{ edu.description }}
+                            </p>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            } @else {
+               <div class="about-card flex flex-col items-center justify-center py-16 text-center">
+                <span class="material-icons text-5xl mb-3 text-base-content/20">school</span>
+                <p class="text-base-content/50">No education added yet.</p>
+              </div>
+            }
+          </section>
+
+          @if (parsedCertifications().length > 0) {
+            <section animateOnScroll style="animation-delay: 300ms;">
+                <div class="flex items-center gap-4 mb-8">
+                <div class="icon-wrapper wrapper-lg bg-gradient-to-br from-secondary to-primary">
+                    <span class="material-icons">verified</span>
+                </div>
+                <div>
+                    <h2 class="text-3xl font-bold">Certifications</h2>
+                    <p class="text-base-content/60 text-sm mt-1">Professional Validations</p>
+                </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    @for (cert of parsedCertifications(); track cert.name; let i = $index) {
+                        <a [href]="cert.url" target="_blank" class="about-card hover:border-primary/50 transition-colors no-underline group" animateOnScroll [style.animation-delay]="(i * 50) + 'ms'">
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="material-icons text-primary/70 group-hover:text-primary transition-colors">stars</span>
+                                <span class="text-xs font-bold bg-base-200 px-2 py-1 rounded">{{ cert.year }}</span>
+                            </div>
+                            <h3 class="font-bold text-base-content group-hover:text-primary transition-colors">{{ cert.name }}</h3>
+                            <p class="text-sm text-base-content/60 mt-1">{{ cert.issuer }}</p>
+                             <div class="mt-4 flex items-center gap-1 text-xs text-primary font-bold opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0">
+                                Verify Credential <span class="material-icons text-xs">open_in_new</span>
+                             </div>
+                        </a>
+                    }
+                </div>
+            </section>
+           }
+
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class=" w-full" animateOnScroll>
+    <div class="w-full ">
+      <div class="relative overflow-hidden p-6 md:p-10 text-center w-full max-w-full">
+        <div class="absolute inset-0 bg-gradient-to-r from-[#133550] to-[#0f172a]"></div>
+        <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
+        <div class="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-[80px]"></div>
+
+        <div class="relative z-10">
+          <div class="icon-wrapper wrapper-lg mx-auto mb-4 rounded-2xl shadow-lg shadow-primary/30">
+            <span class="material-icons text-white">handshake</span>
+          </div>
+
+          <h2 class="text-2xl md:text-4xl font-bold mb-3 text-white leading-tight">Ready to Start a Project?</h2>
+          <p class="text-sm md:text-base text-gray-300 mb-6 max-w-2xl mx-auto leading-relaxed">
+            Let's collaborate and bring your ideas to life with modern technology and clean design.
+          </p>
+
+          <div class="flex flex-col sm:flex-row justify-center gap-4">
+            <a routerLink="/contact" class="btn-cta btn-cta-primary text-base px-8 py-4 no-underline">
+              <span class="material-icons">mail</span>
+              Get in Touch
+            </a>
+            <a routerLink="/projects" class="btn-cta btn-cta-secondary text-base px-8 py-4 text-white border-white/30 hover:bg-white/10 no-underline">
+              <span class="material-icons">grid_view</span>
+              View My Work
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+} @else {
+  <div class="min-h-screen flex justify-center items-center bg-[#0f172a]">
+    <div class="text-center p-8 rounded-2xl border border-white/5 bg-white/5 backdrop-blur">
+      <span class="material-icons text-6xl text-gray-600 mb-4">person_off</span>
+      <p class="text-xl text-gray-400">No profile data available</p>
+    </div>
+  </div>
+}
