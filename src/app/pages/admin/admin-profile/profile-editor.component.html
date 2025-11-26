@@ -1,0 +1,372 @@
+<section class="min-h-screen bg-base-200 pb-20 hero-section-bg">
+  <div class="hero-header relative py-20 mb-12 overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5"></div>
+    <div class="absolute top-10 left-10 w-64 h-64 bg-primary/10 rounded-full blur-3xl animate-pulse"></div>
+    <div class="absolute bottom-10 right-10 w-80 h-80 bg-accent/10 rounded-full blur-3xl animate-pulse"></div>
+
+    <div class="container mx-auto px-4 text-center relative z-10">
+      <h1 class="text-5xl md:text-6xl font-bold mb-4">
+          <span class="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+            Profile Editor
+          </span>
+        </h1>
+      <p class="text-base-content/70 max-w-xl mx-auto">
+        Manage your public portfolio presence. Keep your skills, experience, and achievements up to date.
+      </p>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="flex justify-center items-center h-96">
+      <span class="loading loading-spinner loading-lg text-primary"></span>
+    </div>
+  } @else {
+    <div class="container mx-auto px-4 -mt-8 max-w-7xl relative z-20 mt-4">
+      <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+          <div class="lg:col-span-4 space-y-6">
+
+            <div class="card bg-base-100 shadow-xl border border-base-200 custom-card">
+              <div class="card-body items-center text-center p-6">
+                <h2 class="card-title text-sm uppercase tracking-wider text-base-content/50 mb-4">Profile Photo</h2>
+
+                <div class="relative group">
+                  <div class="avatar placeholder">
+                    <div class="w-40 h-40 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2 overflow-hidden">
+                      @if (filePreview()) {
+                        <img [src]="filePreview()" class="object-cover w-full h-full" />
+                      } @else if (profileImage()) {
+                        <img [src]="profileImage()!.image_url" class="object-cover w-full h-full" />
+                      } @else {
+                        <span class="text-6xl bg-neutral text-neutral-content w-full h-full flex items-center justify-center">
+                          {{ profileForm.get('name')?.value?.charAt(0) || 'U' }}
+                        </span>
+                      }
+                    </div>
+                  </div>
+                  <label class="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer text-white font-medium">
+                    Change
+                    <input type="file" class="hidden" (change)="onFileSelected($event)" accept="image/*">
+                  </label>
+                </div>
+
+                <div class="w-full mt-4 flex gap-2" *ngIf="imageForm.get('file')?.value || profileImage()">
+                   <button *ngIf="imageForm.get('file')?.value" type="button" (click)="onUpdateImage()"
+                           class="btn btn-sm btn-primary flex-1" [disabled]="loadingImage()">
+                     {{ loadingImage() ? 'Uploading...' : 'Save Photo' }}
+                   </button>
+                   <button *ngIf="profileImage()" type="button" (click)="onDeleteImage()"
+                           class="btn btn-sm btn-outline btn-error" title="Delete">
+                     <span class="material-icons text-sm">delete</span>
+                   </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="card bg-base-100 shadow-xl border border-base-200 custom-card">
+              <div class="card-body p-6">
+                <div class="flex items-center gap-2 mb-4">
+                  <span class="material-icons text-primary">badge</span>
+                  <h2 class="card-title text-lg">Identity</h2>
+                </div>
+
+                <div class="space-y-4">
+                  <div class="form-control">
+                    <label class="label"><span class="label-text">Full Name</span></label>
+                    <div class="flex gap-2">
+                      <input type="text" formControlName="name" class="input input-bordered w-full" placeholder="First" />
+                      <input type="text" formControlName="last_name" class="input input-bordered w-full" placeholder="Last" />
+                    </div>
+                  </div>
+
+                  <div class="form-control">
+                    <label class="label"><span class="label-text">Display Name</span></label>
+                    <input type="text" formControlName="display_name" class="input input-bordered" />
+                  </div>
+
+                  <div class="form-control">
+                    <label class="label"><span class="label-text">Professional Title</span></label>
+                    <input type="text" formControlName="title" class="input input-bordered" placeholder="e.g. Senior Dev" />
+                  </div>
+
+                  <div class="form-control">
+                    <label class="label"><span class="label-text">Email</span></label>
+                    <input type="email" formControlName="email" class="input input-bordered" />
+                  </div>
+
+                  <div class="form-control">
+                    <label class="label"><span class="label-text">Short Bio</span></label>
+                    <textarea formControlName="bio" class="textarea textarea-bordered h-24"></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card bg-base-100 shadow-xl border border-base-200 custom-card">
+              <div class="card-body p-6">
+                <div class="flex items-center gap-2 mb-4">
+                  <span class="material-icons text-secondary">share</span>
+                  <h2 class="card-title text-lg">Social & Links</h2>
+                </div>
+                <div class="space-y-3">
+                  <div class="join w-full">
+                    <span class="join-item btn btn-square btn-sm"><i class="fa-brands fa-github"></i>GH</span>
+                    <input type="text" formControlName="github_url" class="input input-sm input-bordered join-item w-full" placeholder="GitHub URL"/>
+                  </div>
+                  <div class="join w-full">
+                    <span class="join-item btn btn-square btn-sm">LI</span>
+                    <input type="text" formControlName="linkedin_url" class="input input-sm input-bordered join-item w-full" placeholder="LinkedIn URL"/>
+                  </div>
+                  <div class="join w-full">
+                    <span class="join-item btn btn-square btn-sm">X</span>
+                    <input type="text" formControlName="twitter_url" class="input input-sm input-bordered join-item w-full" placeholder="Twitter URL"/>
+                  </div>
+                  <div class="join w-full">
+                    <span class="join-item btn btn-square btn-sm">CV</span>
+                    <input type="text" formControlName="resume_url" class="input input-sm input-bordered join-item w-full" placeholder="Resume PDF Link"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="lg:col-span-8 space-y-6">
+
+            <div class="card bg-base-100 shadow-xl border border-base-200 custom-card">
+              <div class="card-body p-6">
+                <div class="flex justify-between items-center mb-6">
+                  <div class="flex items-center gap-3">
+                    <div class="p-2 bg-primary/10 rounded-lg text-primary"><span class="material-icons">psychology</span></div>
+                    <h2 class="text-xl font-bold">Skills</h2>
+                  </div>
+                  <button type="button" (click)="openModal('skill')" class="btn btn-sm btn-primary gap-2">
+                    <span class="material-icons text-sm">add</span> Add
+                  </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  @for (skill of skillsArray.controls; track skill; let i = $index) {
+                    <div class="flex items-center justify-between p-3 bg-base-200 rounded-lg group hover:bg-base-300 transition-colors list-item-custom">
+                      <div class="flex items-center gap-3 overflow-hidden">
+                        <span class="material-icons text-base-content/50">{{ skill.get('icon')?.value || 'code' }}</span>
+                        <div class="flex flex-col">
+                          <span class="font-semibold text-sm">{{ skill.get('name')?.value }}</span>
+                          <span class="text-xs opacity-60">{{ skill.get('proficiency')?.value }}% · {{ skill.get('yearsOfExperience')?.value }}y</span>
+                        </div>
+                      </div>
+                      <div class="flex opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button type="button" (click)="openModal('skill', i)" class="btn btn-ghost btn-xs btn-square"><span class="material-icons text-xs">edit</span></button>
+                        <button type="button" (click)="askDelete('skill', i)" class="btn btn-ghost btn-xs btn-square text-error"><span class="material-icons text-xs">delete</span></button>
+                      </div>
+                    </div>
+                  }
+                  @if (skillsArray.controls.length === 0) {
+                    <div class="col-span-full text-center py-8 text-base-content/40 italic border-2 border-dashed border-base-300 rounded-box">
+                      No skills added yet.
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <div class="card bg-base-100 shadow-xl border border-base-200 custom-card">
+              <div class="card-body p-6">
+                <div class="flex justify-between items-center mb-6">
+                  <div class="flex items-center gap-3">
+                    <div class="p-2 bg-secondary/10 rounded-lg text-secondary"><span class="material-icons">work</span></div>
+                    <h2 class="text-xl font-bold">Experience</h2>
+                  </div>
+                  <button type="button" (click)="openModal('experience')" class="btn btn-sm btn-secondary gap-2">
+                    <span class="material-icons text-sm">add</span> Add
+                  </button>
+                </div>
+
+                <div class="space-y-4">
+                  @for (exp of experienceArray.controls; track exp; let i = $index) {
+                    <div class="relative pl-4 border-l-2 border-secondary/30 hover:border-secondary transition-colors py-2">
+                      <div class="flex justify-between items-start">
+                        <div>
+                          <h3 class="font-bold text-lg">{{ exp.get('role')?.value }}</h3>
+                          <div class="text-sm text-base-content/70 font-medium">{{ exp.get('company')?.value }}</div>
+                          <div class="text-xs text-base-content/50 mb-2">{{ exp.get('period')?.value }}</div>
+                          <p class="text-sm whitespace-pre-wrap">{{ exp.get('description')?.value }}</p>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                          <button type="button" (click)="openModal('experience', i)" class="btn btn-ghost btn-xs"><span class="material-icons text-sm">edit</span></button>
+                          <button type="button" (click)="askDelete('experience', i)" class="btn btn-ghost btn-xs text-error"><span class="material-icons text-sm">delete</span></button>
+                        </div>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <div class="card bg-base-100 shadow-xl border border-base-200 custom-card">
+              <div class="card-body p-6">
+                <div class="flex justify-between items-center mb-6">
+                  <div class="flex items-center gap-3">
+                    <div class="p-2 bg-accent/10 rounded-lg text-accent"><span class="material-icons">school</span></div>
+                    <h2 class="text-xl font-bold">Education</h2>
+                  </div>
+                  <button type="button" (click)="openModal('education')" class="btn btn-sm btn-accent gap-2">
+                    <span class="material-icons text-sm">add</span> Add
+                  </button>
+                </div>
+
+                 <div class="space-y-3">
+                  @for (edu of educationArray.controls; track edu; let i = $index) {
+                    <div class="flex items-center justify-between p-4 bg-base-200/50 rounded-lg list-item-custom">
+                      <div>
+                         <div class="font-bold">{{ edu.get('institution')?.value }}</div>
+                         <div class="text-sm">{{ edu.get('degree')?.value }}</div>
+                         <div class="text-xs opacity-60">{{ edu.get('period')?.value }}</div>
+                      </div>
+                      <div class="flex gap-1">
+                          <button type="button" (click)="openModal('education', i)" class="btn btn-circle btn-ghost btn-sm"><span class="material-icons text-sm">edit</span></button>
+                          <button type="button" (click)="askDelete('education', i)" class="btn btn-circle btn-ghost btn-sm text-error"><span class="material-icons text-sm">delete</span></button>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+               <div class="card bg-base-100 shadow-xl border border-base-200 custom-card">
+                  <div class="card-body p-5">
+                    <div class="flex justify-between items-center mb-4">
+                      <h3 class="font-bold text-lg flex items-center gap-2"><span class="material-icons text-warning text-sm">verified</span> Certifications</h3>
+                      <button type="button" (click)="openModal('certification')" class="btn btn-xs btn-outline">Add</button>
+                    </div>
+                    <ul class="space-y-3">
+                      @for (cert of certificationsArray.controls; track cert; let i = $index) {
+                        <li class="flex justify-between group">
+                          <div class="overflow-hidden">
+                            <div class="font-semibold truncate">{{ cert.get('name')?.value }}</div>
+                            <div class="text-xs opacity-70">{{ cert.get('issuer')?.value }} · {{ cert.get('year')?.value }}</div>
+                          </div>
+                          <div class="opacity-0 group-hover:opacity-100 transition-opacity">
+                             <button (click)="openModal('certification', i)" class="text-primary hover:underline text-xs mr-2">Edit</button>
+                             <button (click)="askDelete('certification', i)" class="text-error hover:underline text-xs">Del</button>
+                          </div>
+                        </li>
+                      }
+                    </ul>
+                  </div>
+               </div>
+
+               <div class="card bg-base-100 shadow-xl border border-base-200 custom-card">
+                  <div class="card-body p-5">
+                    <div class="flex justify-between items-center mb-4">
+                      <h3 class="font-bold text-lg flex items-center gap-2"><span class="material-icons text-success text-sm">emoji_events</span> Achievements</h3>
+                      <button type="button" (click)="openModal('achievement')" class="btn btn-xs btn-outline">Add</button>
+                    </div>
+                     <ul class="space-y-3">
+                      @for (ach of achievementsArray.controls; track ach; let i = $index) {
+                        <li class="flex justify-between group">
+                          <div>
+                            <div class="font-semibold">{{ ach.get('title')?.value }}</div>
+                            <div class="text-xs opacity-70 line-clamp-1">{{ ach.get('description')?.value }}</div>
+                          </div>
+                           <div class="opacity-0 group-hover:opacity-100 transition-opacity flex items-start">
+                             <button (click)="openModal('achievement', i)" class="text-primary hover:underline text-xs mr-2">Edit</button>
+                             <button (click)="askDelete('achievement', i)" class="text-error hover:underline text-xs">Del</button>
+                          </div>
+                        </li>
+                      }
+                    </ul>
+                  </div>
+               </div>
+            </div>
+
+          </div> </div> <div class="fixed bottom-0 left-0 right-0 bg-base-100/80 backdrop-blur-md border-t border-base-300 p-4 z-40">
+          <div class="container mx-auto max-w-7xl flex justify-between items-center">
+            <button type="button" (click)="goBack()" class="btn btn-ghost gap-2">
+              <span class="material-icons">arrow_back</span> Back
+            </button>
+
+            <div class="flex items-center gap-4">
+               <span *ngIf="successMessage()" class="text-success text-sm font-medium animate-pulse">{{ successMessage() }}</span>
+               <span *ngIf="errorMessage()" class="text-error text-sm font-medium">{{ errorMessage() }}</span>
+
+               <button type="submit" [disabled]="profileForm.invalid || loading()" class="btn btn-primary px-8">
+                @if (loading()) { <span class="loading loading-spinner"></span> }
+                @else { <span class="material-icons">save</span> Save Changes }
+               </button>
+            </div>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  }
+</section>
+
+<dialog class="modal modal-bottom sm:modal-middle" [open]="activeModal() !== null">
+  <div class="modal-box">
+    <h3 class="font-bold text-lg mb-4 capitalize">
+      {{ editingIndex() === null ? 'Add' : 'Edit' }} {{ activeModal() }}
+    </h3>
+
+    <form [formGroup]="skillForm" *ngIf="activeModal() === 'skill'" class="space-y-4">
+        <div class="grid grid-cols-2 gap-4">
+          <div class="form-control"><label class="label"><span class="label-text">Name</span></label><input formControlName="name" class="input input-bordered"></div>
+          <div class="form-control"><label class="label"><span class="label-text">Icon</span></label><input formControlName="icon" class="input input-bordered" placeholder="e.g. code"></div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+           <div class="form-control"><label class="label"><span class="label-text">Proficiency %</span></label><input type="number" formControlName="proficiency" class="input input-bordered"></div>
+           <div class="form-control"><label class="label"><span class="label-text">Years Exp.</span></label><input type="number" formControlName="yearsOfExperience" class="input input-bordered"></div>
+        </div>
+    </form>
+
+    <form [formGroup]="experienceForm" *ngIf="activeModal() === 'experience'" class="space-y-4">
+      <div class="form-control"><label class="label"><span class="label-text">Role / Job Title</span></label><input formControlName="role" class="input input-bordered" placeholder="Senior Dev"></div>
+      <div class="form-control"><label class="label"><span class="label-text">Company</span></label><input formControlName="company" class="input input-bordered" placeholder="Tech Corp"></div>
+      <div class="form-control"><label class="label"><span class="label-text">Period</span></label><input formControlName="period" class="input input-bordered" placeholder="2022 - Present"></div>
+      <div class="form-control"><label class="label"><span class="label-text">Description</span></label><textarea formControlName="description" class="textarea textarea-bordered h-24"></textarea></div>
+    </form>
+
+    <form [formGroup]="educationForm" *ngIf="activeModal() === 'education'" class="space-y-4">
+      <div class="form-control"><label class="label"><span class="label-text">Institution</span></label><input formControlName="institution" class="input input-bordered"></div>
+      <div class="form-control"><label class="label"><span class="label-text">Degree</span></label><input formControlName="degree" class="input input-bordered"></div>
+      <div class="form-control"><label class="label"><span class="label-text">Period</span></label><input formControlName="period" class="input input-bordered"></div>
+    </form>
+
+    <form [formGroup]="certificationForm" *ngIf="activeModal() === 'certification'" class="space-y-4">
+      <div class="form-control"><label class="label"><span class="label-text">Name</span></label><input formControlName="name" class="input input-bordered"></div>
+      <div class="grid grid-cols-2 gap-4">
+         <div class="form-control"><label class="label"><span class="label-text">Issuer</span></label><input formControlName="issuer" class="input input-bordered"></div>
+         <div class="form-control"><label class="label"><span class="label-text">Year</span></label><input formControlName="year" class="input input-bordered"></div>
+      </div>
+      <div class="form-control"><label class="label"><span class="label-text">URL (Optional)</span></label><input formControlName="url" class="input input-bordered"></div>
+    </form>
+
+    <form [formGroup]="achievementForm" *ngIf="activeModal() === 'achievement'" class="space-y-4">
+      <div class="form-control"><label class="label"><span class="label-text">Title</span></label><input formControlName="title" class="input input-bordered"></div>
+      <div class="form-control"><label class="label"><span class="label-text">Date</span></label><input formControlName="date" class="input input-bordered" placeholder="Month Year"></div>
+      <div class="form-control"><label class="label"><span class="label-text">Description</span></label><textarea formControlName="description" class="textarea textarea-bordered"></textarea></div>
+    </form>
+
+    <div class="modal-action">
+      <button class="btn" (click)="closeModal()">Cancel</button>
+      <button class="btn btn-primary" (click)="saveModalData()">Save</button>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button (click)="closeModal()">close</button>
+  </form>
+</dialog>
+
+<dialog class="modal" [open]="isDeleteModalOpen()">
+  <div class="modal-box">
+    <h3 class="font-bold text-lg text-error">Confirm Deletion</h3>
+    <p class="py-4">Are you sure you want to remove this item? This cannot be undone.</p>
+    <div class="modal-action">
+      <button class="btn" (click)="isDeleteModalOpen.set(false)">Cancel</button>
+      <button class="btn btn-error" (click)="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</dialog>

@@ -1,0 +1,208 @@
+<div class="max-w-4xl mx-auto space-y-8 py-10 animate-fade-in px-4">
+
+  <div class="flex items-center gap-4 mb-2">
+    <div class="p-3 bg-primary/10 rounded-xl">
+      <span class="material-icons text-primary text-3xl">security</span>
+    </div>
+    <div>
+      <h1 class="text-3xl font-bold text-base-content">Seguridad de la Cuenta</h1>
+      <p class="text-base-content/60">Gestiona tu contraseña y autenticación de dos factores.</p>
+    </div>
+  </div>
+
+  @if (successMessage()) {
+  <div role="alert" class="alert alert-success shadow-md border-l-4 border-l-success-content/20 animate-bounce-short">
+    <span class="material-icons">check_circle</span>
+    <div>
+      <h3 class="font-bold">¡Operación exitosa!</h3>
+      <div class="text-xs">{{ successMessage() }}</div>
+    </div>
+  </div>
+  }
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+
+    <div class="card bg-base-100 shadow-xl border border-base-200 hover:shadow-2xl transition-shadow duration-300">
+      <div class="card-body">
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="card-title text-xl font-bold">Contraseña</h2>
+          <div class="badge badge-primary badge-outline text-xs">Acceso</div>
+        </div>
+        <div class="divider my-0"></div>
+
+        @if (errorMessage() && !emailErrorMessage()) {
+        <div role="alert" class="alert alert-error text-sm py-2 rounded-lg mb-4">
+          <span class="material-icons text-lg">error</span>
+          <span>{{ errorMessage() }}</span>
+        </div>
+        }
+
+        <form [formGroup]="passwordForm" (ngSubmit)="onChangePassword()" class="space-y-4">
+
+          <div class="form-control">
+            <label class="label"><span class="label-text font-medium">Contraseña Actual</span></label>
+            <label class="input input-bordered flex items-center gap-2 focus-within:input-primary">
+              <span class="material-icons text-base-content/40 text-sm">lock</span>
+              <input type="password" formControlName="currentPassword" placeholder="••••••••" class="grow" />
+            </label>
+          </div>
+
+          <div class="form-control">
+            <label class="label"><span class="label-text font-medium">Nueva Contraseña</span></label>
+            <label class="input input-bordered flex items-center gap-2 focus-within:input-primary"
+              [class.input-error]="passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched">
+              <span class="material-icons text-base-content/40 text-sm">key</span>
+              <input type="password" formControlName="newPassword" placeholder="••••••••" class="grow" />
+            </label>
+            @if (passwordForm.get('newPassword')?.hasError('minlength')) {
+            <span class="label-text-alt text-error mt-1 flex items-center gap-1">
+              <span class="material-icons text-xs">info</span> Mínimo 8 caracteres
+            </span>
+            }
+          </div>
+
+          <div class="form-control">
+            <label class="label"><span class="label-text font-medium">Confirmar Contraseña</span></label>
+            <label class="input input-bordered flex items-center gap-2 focus-within:input-primary"
+              [class.input-error]="passwordForm.get('confirmPassword')?.hasError('mustMatch')">
+              <span class="material-icons text-base-content/40 text-sm">check_circle_outline</span>
+              <input type="password" formControlName="confirmPassword" placeholder="••••••••" class="grow" />
+            </label>
+            @if (passwordForm.get('confirmPassword')?.hasError('mustMatch')) {
+             <span class="label-text-alt text-error mt-1">Las contraseñas no coinciden</span>
+            }
+          </div>
+
+          <div class="card-actions justify-end mt-6">
+            <button type="submit" [disabled]="passwordForm.invalid || authService.loading()"
+              class="btn btn-primary w-full sm:w-auto shadow-md shadow-primary/20">
+              @if(authService.loading()){ <span class="loading loading-spinner loading-xs"></span> }
+              @else { <span class="material-icons text-lg">save</span> }
+              Actualizar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+
+    <div class="card bg-base-100 shadow-xl border border-base-200 hover:shadow-2xl transition-shadow duration-300">
+      <div class="card-body">
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="card-title text-xl font-bold">Autenticación (2FA)</h2>
+           @if (currentUser()?.totp_enabled) {
+             <div class="badge badge-success text-white gap-1 font-bold">
+               <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span> Activo
+             </div>
+           } @else {
+             <div class="badge badge-ghost opacity-70">Inactivo</div>
+           }
+        </div>
+        <div class="divider my-0"></div>
+
+        @if (errorMessage() && emailErrorMessage()) {
+        <div role="alert" class="alert alert-error text-sm py-2 rounded-lg mb-4">
+          <span class="material-icons text-lg">error</span>
+          <span>{{ errorMessage() }}</span>
+        </div>
+        }
+
+        @if (currentUser()) {
+
+          @if (!currentUser()?.totp_enabled && !isVerifyingTOTP()) {
+          <div class="text-center py-4">
+            <div class="w-16 h-16 bg-base-200 rounded-full flex items-center justify-center mx-auto mb-4">
+               <span class="material-icons text-4xl text-base-content/50">phonelink_lock</span>
+            </div>
+            <p class="text-base-content/70 text-sm mb-6 px-4">
+              Protege tu cuenta solicitando un código desde tu app (Google Auth, Authy) al iniciar sesión.
+            </p>
+
+            <form [formGroup]="enableTotpForm" (ngSubmit)="onEnableTOTP()" class="bg-base-200/50 p-4 rounded-xl">
+              <div class="form-control mb-4">
+                <label class="label pt-0"><span class="label-text font-bold text-xs uppercase tracking-wider opacity-70">Confirma con tu contraseña</span></label>
+                <label class="input input-bordered flex items-center gap-2 bg-base-100">
+                   <span class="material-icons text-base-content/40 text-sm">lock</span>
+                   <input type="password" formControlName="password" placeholder="Tu contraseña actual" class="grow" />
+                </label>
+              </div>
+              <button type="submit" [disabled]="enableTotpForm.invalid || authService.loading()" class="btn btn-neutral w-full group">
+                Comenzar Configuración
+                <span class="material-icons group-hover:translate-x-1 transition-transform text-sm">arrow_forward</span>
+              </button>
+            </form>
+          </div>
+          }
+
+          @if (isVerifyingTOTP()) {
+          <div class="animate-fade-in">
+            <div class="steps steps-vertical lg:steps-horizontal w-full text-xs mb-6 opacity-70">
+              <li class="step step-primary">Escanear</li>
+              <li class="step step-primary">Verificar</li>
+            </div>
+
+            <div class="bg-white p-4 rounded-xl shadow-inner border border-base-300 flex justify-center mb-6">
+              <img [src]="qrCodeDataUrl()" alt="QR Code" class="w-48 h-48 object-contain mix-blend-multiply">
+            </div>
+
+            <div class="text-center mb-4">
+              <p class="text-sm font-medium">Ingresa el código de 6 dígitos</p>
+            </div>
+
+            <form [formGroup]="totpForm" (ngSubmit)="onVerifyTOTP()" class="space-y-4">
+              <div class="form-control flex justify-center">
+                <input type="text" formControlName="code" maxlength="6" inputmode="numeric" placeholder="000 000"
+                  class="input input-lg input-bordered w-full text-center text-3xl tracking-[0.75rem] font-mono focus:input-primary bg-base-200/50 placeholder:tracking-normal placeholder:text-xl placeholder:opacity-40"
+                  [class.input-error]="totpForm.get('code')?.invalid && totpForm.get('code')?.touched" />
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <button type="button" (click)="onCancelVerify()" class="btn btn-ghost btn-sm">
+                  Cancelar
+                </button>
+                <button type="submit" [disabled]="totpForm.invalid || authService.loading()" class="btn btn-primary btn-sm">
+                  Activar
+                </button>
+              </div>
+            </form>
+          </div>
+          }
+
+          @if (currentUser()?.totp_enabled && !isVerifyingTOTP()) {
+          <div class="bg-success/5 border border-success/20 rounded-xl p-6 text-center mb-6">
+            <div class="w-16 h-16 bg-success/20 rounded-full flex items-center justify-center mx-auto mb-3 animate-pulse-slow">
+              <span class="material-icons text-4xl text-success">shield</span>
+            </div>
+            <h3 class="font-bold text-success text-lg">Cuenta Protegida</h3>
+            <p class="text-xs text-base-content/60 mt-1">El segundo factor de autenticación está activo.</p>
+          </div>
+
+          <div class="collapse collapse-arrow border border-base-200 bg-base-100 rounded-box">
+            <input type="checkbox" />
+            <div class="collapse-title text-sm font-medium text-error flex items-center gap-2">
+              <span class="material-icons text-lg">no_encryption</span>
+              Desactivar Autenticación 2FA
+            </div>
+            <div class="collapse-content">
+              <p class="text-xs text-base-content/60 mb-3">Esto reducirá la seguridad de tu cuenta.</p>
+              <form [formGroup]="disableTotpForm" (ngSubmit)="onDisableTOTP()" class="flex flex-col gap-3">
+                 <input type="password" formControlName="password" placeholder="Confirma tu contraseña"
+                  class="input input-bordered input-sm w-full" />
+                 <button type="submit" [disabled]="disableTotpForm.invalid || authService.loading()" class="btn btn-error btn-sm w-full text-white">
+                  Confirmar Desactivación
+                </button>
+              </form>
+            </div>
+          </div>
+          }
+
+        } @else {
+          <div class="flex flex-col gap-4 animate-pulse">
+            <div class="h-32 bg-base-200 rounded-xl w-full"></div>
+            <div class="h-10 bg-base-200 rounded-lg w-full"></div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

@@ -103,7 +103,7 @@
 
               <div class="prose max-w-none">
                 <p class="text-base-content/80 leading-relaxed text-base">
-                  {{ proj.description }}
+                  <markdown [data]="proj.content"></markdown>
                 </p>
 
                 <div class="mt-6">

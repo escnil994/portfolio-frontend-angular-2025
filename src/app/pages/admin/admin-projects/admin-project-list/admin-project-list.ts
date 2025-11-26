@@ -1,10 +1,7 @@
-// admin-project-list.component.ts - NUEVO ARCHIVO
-
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ProjectService } from '../../../../services/project.service';
-import { AdminProfile } from '../../admin-profile/admin-profile';
 import { ProjectUI } from '../../../../interfaces/portfolio.interface';
 import { AdminService } from '../../../../services/admin.service';
 

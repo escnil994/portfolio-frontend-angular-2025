@@ -1,10 +1,9 @@
-
 import { Routes } from '@angular/router';
 import { authGuard } from '../../guards/auth.guard';
 
 export const ADMIN_ROUTES: Routes = [
   {
-    path: '', // /admin
+    path: '',
     loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent),
     canActivate: [authGuard]
   },
@@ -23,8 +22,6 @@ export const ADMIN_ROUTES: Routes = [
     loadComponent: () => import('./admin-projects/admin-project-form/admin-project-form.component').then(m => m.AdminProjectFormComponent),
     canActivate: [authGuard]
   },
-
-
   {
     path: 'blog',
     loadComponent: () => import('./admin-blog/admin-blog-list/admin-blog-list').then(m => m.AdminBlogListComponent),
@@ -41,33 +38,22 @@ export const ADMIN_ROUTES: Routes = [
     canActivate: [authGuard]
   },
 
-  /*
-
-  // Profile route
   {
     path: 'profile',
-    loadComponent: () => import('./profile-editor/profile-editor.component').then(m => m.ProfileEditorComponent),
+    loadComponent: () => import('./admin-profile/profile-editor.component').then(m => m.ProfileEditorComponent),
     canActivate: [authGuard]
   },
 
-  // Messages route
   {
     path: 'messages',
-    loadComponent: () => import('./messages/messages.component').then(m => m.MessagesComponent),
+    loadComponent: () => import('./messages-admin/messages.component').then(m => m.MessagesComponent),
     canActivate: [authGuard]
   },
-
-  // Settings route
   {
     path: 'settings',
-    loadComponent: () => import('./settings/settings.component').then(m => m.SettingsComponent),
+    loadComponent: () => import('./security-settings/security-settings.component').then(m => m.SettingsComponent),
     canActivate: [authGuard]
   },
-
-  */
-
-
-  // Redirect unknown routes to dashboard
   {
     path: '**',
     redirectTo: '',

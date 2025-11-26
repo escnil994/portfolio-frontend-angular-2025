@@ -10,6 +10,7 @@ import { UserInfoModalComponent } from '../../../directives/user-info.component'
 import { ShareModalComponent } from '../../../directives/share-modal.component';
 import { BlogService } from '../../../services/blog.service';
 import { ReactionType } from '../../../enums/reaction-type.enum';
+import { MarkdownComponent } from 'ngx-markdown';
 
 @Component({
   selector: 'app-blog-detail',
@@ -21,6 +22,7 @@ import { ReactionType } from '../../../enums/reaction-type.enum';
     CommentSectionComponent,
     ImageCarouselComponent,
     ImageModalComponent,
+    MarkdownComponent,
     UserInfoModalComponent,
     ShareModalComponent,
   ],

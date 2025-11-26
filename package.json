@@ -5,11 +5,8 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
-    "build:ssr": "ng build",
-    "deploy": "firebase deploy",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test",
-    "serve:ssr:frontend": "node dist/frontend/server/server.mjs"
+    "test": "ng test"
   },
   "prettier": {
     "printWidth": 100,
@@ -36,6 +33,7 @@
     "@angular/ssr": "^20.3.7",
     "@tailwindcss/postcss": "^4.1.16",
     "express": "^5.1.0",
+    "ngx-markdown": "^21.0.0",
     "postcss": "^8.5.6",
     "rxjs": "~7.8.0",
     "tailwindcss": "^4.1.16",
@@ -45,9 +43,9 @@
     "@angular/build": "^20.3.7",
     "@angular/cli": "^20.3.7",
     "@angular/compiler-cli": "20.3.7",
-    "@types/express": "^5.0.1",
+    "@types/express": "^5.0.5",
     "@types/jasmine": "~5.1.0",
-    "@types/node": "^20.17.19",
+    "@types/node": "^20.19.24",
     "daisyui": "^5.3.10",
     "jasmine-core": "~5.9.0",
     "karma": "~6.4.0",

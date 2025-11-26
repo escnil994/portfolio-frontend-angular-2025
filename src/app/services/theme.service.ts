@@ -23,7 +23,6 @@ export class ThemeService {
 
   private applyTheme() {
     if (!this.isBrowser) return;
-
     const theme = this.isDark() ? 'dark' : 'light';
     document.documentElement.setAttribute('data-theme', theme);
     document.documentElement.classList.toggle('dark', this.isDark());

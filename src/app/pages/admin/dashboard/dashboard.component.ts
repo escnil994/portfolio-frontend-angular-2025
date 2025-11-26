@@ -7,12 +7,12 @@ import { AuthService } from '../../../services/auth.service';
   selector: 'app-dashboard',
   standalone: true,
   imports: [CommonModule, RouterLink],
-  templateUrl: './dashboard.component.html'
+  templateUrl: './dashboard.component.html',
 })
 export class DashboardComponent {
   authService = inject(AuthService);
 
-  user = computed(() => this.authService.currentUser());
+  readonly currentUser = this.authService.currentUser;
 
   logout(): void {
     this.authService.logout();

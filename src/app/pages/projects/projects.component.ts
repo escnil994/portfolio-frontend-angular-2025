@@ -40,6 +40,7 @@ export class ProjectsComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe({
       next: (projects) => {
+
         this.projects.set(projects);
         this.loading.set(false);
       },

@@ -1,0 +1,159 @@
+// Colores aplicados del About Component
+$primary-gradient: linear-gradient(135deg, #133550, #0ea5e9);
+$card-bg: var(--fallback-b1, oklch(var(--b1)));
+
+.hero-section-bg {
+  position: relative;
+  background: linear-gradient(to bottom right, rgba(19, 53, 80, 0.05), transparent, rgba(14, 165, 233, 0.05)) !important;
+}
+
+.hero-header {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+// TRANSFORMACIÃ"N DE TARJETAS - CONTACT COMPONENT EXACT MATCH
+.card.custom-card {
+  background: $card-bg;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(19, 53, 80, 0.15);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 20px -5px rgba(14, 165, 233, 0.12);
+    border-color: rgba(14, 165, 233, 0.25);
+  }
+}
+
+// ESTILO DE LOS INPUTS
+.input, .textarea, .select {
+  border-radius: 0.5rem;
+  border: 1px solid rgba(19, 53, 80, 0.15) !important;
+  background-color: transparent !important;
+  transition: all 0.3s ease;
+  color: inherit;
+
+  &:focus {
+    border-color: #0ea5e9 !important;
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
+    outline: none;
+  }
+
+  &::placeholder {
+    color: rgba(0, 0, 0, 0.5);
+  }
+}
+
+// LIST ITEMS
+.list-item-custom {
+  background: $card-bg;
+  border: 1px solid rgba(19, 53, 80, 0.15);
+  transition: all 0.3s ease;
+  border-radius: 0.75rem;
+
+  &:hover {
+    background: $card-bg;
+    border-color: rgba(14, 165, 233, 0.3);
+    box-shadow: 0 4px 12px -2px rgba(14, 165, 233, 0.15);
+  }
+}
+
+// OVERRIDE BG COLORS
+.bg-base-200 {
+  background-color: $card-bg !important;
+  border: 1px solid rgba(19, 53, 80, 0.15) !important;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: $card-bg !important;
+    border-color: rgba(14, 165, 233, 0.3);
+    box-shadow: 0 4px 12px -2px rgba(14, 165, 233, 0.15);
+  }
+}
+
+.bg-base-200\/50 {
+  background-color: $card-bg !important;
+  border: 1px solid rgba(19, 53, 80, 0.15) !important;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: $card-bg !important;
+    border-color: rgba(14, 165, 233, 0.3);
+    box-shadow: 0 4px 12px -2px rgba(14, 165, 233, 0.15);
+  }
+}
+
+.bg-base-300 {
+  background-color: rgba(19, 53, 80, 0.1) !important;
+  border: 1px solid rgba(19, 53, 80, 0.15) !important;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: rgba(19, 53, 80, 0.12) !important;
+    border-color: rgba(14, 165, 233, 0.3);
+  }
+}
+
+// MODAL STYLES
+.modal-box {
+  background: $card-bg;
+  border: 1px solid rgba(19, 53, 80, 0.15);
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 0 20px rgba(14, 165, 233, 0.1);
+}
+
+.modal-backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+// BUTTON HOVER STATES
+.btn {
+  transition: all 0.3s ease;
+
+  &:hover:not(:disabled) {
+    border-color: rgba(14, 165, 233, 0.4) !important;
+  }
+}
+
+.btn-primary:hover:not(:disabled) {
+  box-shadow: 0 0 20px rgba(19, 53, 80, 0.4);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  box-shadow: 0 0 20px rgba(19, 53, 80, 0.4);
+}
+
+.btn-accent:hover:not(:disabled) {
+  box-shadow: 0 0 20px rgba(14, 165, 233, 0.4);
+}
+
+// ANIMACIONES DE FONDO (Blobs)
+.animate-pulse-slow {
+  animation: pulse 6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .5; }
+}
+
+.animate-gradient {
+  background-size: 200% auto;
+  animation: gradient 4s linear infinite;
+}
+
+@keyframes gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+// CARD BODY
+.card-body {
+  border-radius: 1rem;
+}

@@ -1,5 +1,4 @@
 <section class="hero-section relative min-h-screen flex items-center justify-center overflow-hidden">
-  <!-- Background Effects -->
   <div class="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5"></div>
   <div class="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse-slow"></div>
   <div class="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse-slow"
@@ -7,7 +6,6 @@
 
   <div class="container mx-auto px-4 relative z-10">
     <div class="max-w-md mx-auto">
-      <!-- Header -->
       <div class="text-center mb-8 animate-fade-in">
         <div class="mb-6">
           <div
@@ -20,14 +18,45 @@
             Verify Your Identity
           </span>
         </h1>
-        <p class="text-base-content/70 text-lg">Enter the 6-digit code sent to your email</p>
+        <p class="text-base-content/70 text-lg">
+          @switch (selectedMethod()) {
+            @case ('totp') { Use the code from your authenticator app. }
+            @case ('email') { Use the 6-digit code sent to your email. }
+            @case ('backup') { Enter one of your 8-digit backup codes. }
+          }
+        </p>
       </div>
 
-      <!-- Verify Form Card -->
       <div class="card bg-base-100 shadow-2xl border border-base-300 animate-slide-up">
         <div class="card-body p-8">
+
+          @if (availableMethods().length > 1) {
+          <div role="tablist" class="tabs tabs-boxed grid-cols-3 mb-6">
+            @if (availableMethods().includes('totp')) {
+            <a role="tab" class="tab"
+               [class.tab-active]="selectedMethod() === 'totp'"
+               (click)="selectMethod('totp')">
+              <span class="material-icons text-base mr-1">smartphone</span> App
+            </a>
+            }
+            @if (availableMethods().includes('email')) {
+            <a role="tab" class="tab"
+               [class.tab-active]="selectedMethod() === 'email'"
+               (click)="selectMethod('email')">
+              <span class="material-icons text-base mr-1">email</span> Email
+            </a>
+            }
+            @if (availableMethods().includes('backup')) {
+            <a role="tab" class="tab"
+               [class.tab-active]="selectedMethod() === 'backup'"
+               (click)="selectMethod('backup')">
+              <span class="material-icons text-base mr-1">emergency</span> Backup
+            </a>
+            }
+          </div>
+          }
+
           <form [formGroup]="verifyForm" (ngSubmit)="onSubmit()" class="space-y-6">
-            <!-- Error Message -->
             @if (errorMessage()) {
             <div class="alert alert-error shadow-lg animate-shake">
               <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none"
@@ -38,8 +67,6 @@
               <span>{{ errorMessage() }}</span>
             </div>
             }
-
-            <!-- Success Message -->
             @if (successMessage()) {
             <div class="alert alert-success shadow-lg">
               <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none"
@@ -51,32 +78,30 @@
             </div>
             }
 
-            <!-- Code Input -->
             <div class="form-control">
               <label class="label">
-                <span class="label-text font-semibold text-center w-full">Verification Code</span>
+                <span class="label-text font-semibold text-center w-full">
+                  @switch (selectedMethod()) {
+                    @case ('totp') { Authenticator Code }
+                    @case ('email') { Email Verification Code }
+                    @case ('backup') { Backup Code }
+                  }
+                </span>
               </label>
               <div class="relative">
-                <input type="text" formControlName="code" maxlength="6" inputmode="numeric"
-                  placeholder="000000"
-                  class="input input-bordered w-full text-center text-3xl tracking-[1rem] font-mono focus:input-primary transition-all"
+                <input type="text" formControlName="code"
+                  [maxlength]="selectedMethod() === 'backup' ? 9 : 6"
+                  [attr.inputmode]="selectedMethod() === 'backup' ? 'text' : 'numeric'"
+                  [placeholder]="selectedMethod() === 'backup' ? 'XXXX-XXXX' : '000000'"
+                  class="input input-bordered w-full text-center text-3xl font-mono focus:input-primary transition-all"
+                  [class.tracking-[1rem]]="selectedMethod() !== 'backup'"
+                  [class.tracking-widest]="selectedMethod() === 'backup'"
                   [class.input-error]="verifyForm.get('code')?.invalid && verifyForm.get('code')?.touched"
                   (input)="onCodeInput($event)"
                   autocomplete="one-time-code" />
               </div>
-              @if (verifyForm.get('code')?.invalid && verifyForm.get('code')?.touched) {
-              <label class="label">
-                <span class="label-text-alt text-error text-center w-full">6-digit code is required</span>
-              </label>
-              }
-              <label class="label">
-                <span class="label-text-alt text-base-content/50 text-center w-full">
-                  Code expires in 10 minutes
-                </span>
-              </label>
             </div>
 
-            <!-- Submit Button -->
             <button type="submit" [disabled]="verifyForm.invalid || authService.loading()"
               class="btn btn-primary w-full gap-2 shadow-lg hover:shadow-xl transition-all group">
               @if (authService.loading()) {
@@ -85,57 +110,38 @@
               } @else {
               <span class="material-icons">check_circle</span>
               Verify Code
-              <span class="material-icons group-hover:scale-110 transition-transform">arrow_forward</span>
               }
             </button>
 
-            <!-- Resend Code -->
+            @if (selectedMethod() === 'email') {
             <div class="text-center pt-2">
               <p class="text-sm text-base-content/60 mb-2">
-                Didn't receive the code?
+                @if (!emailSent()) {
+                  Click below to send a code to your email.
+                } @else {
+                  Didn't receive the code?
+                }
               </p>
-              <button type="button" (click)="resendCode()" [disabled]="resendTimer() > 0"
+              <button type="button" (click)="requestEmailCode()" [disabled]="resendTimer() > 0"
                 class="btn btn-ghost btn-sm gap-2">
                 @if (resendTimer() > 0) {
                 <span class="material-icons text-base">schedule</span>
                 Resend in {{ resendTimer() }}s
                 } @else {
                 <span class="material-icons text-base">refresh</span>
-                Resend Code
+                @if (!emailSent()) { Send Code } @else { Resend Code }
                 }
               </button>
             </div>
+            }
 
-            <!-- Back to Login -->
             <div class="text-center pt-2">
-              <a routerLink="/login" class="link link-hover text-primary gap-1 inline-flex items-center group">
+              <a routerLink="/private/user/me/login" class="link link-hover text-primary gap-1 inline-flex items-center group">
                 <span class="material-icons text-sm group-hover:-translate-x-1 transition-transform">arrow_back</span>
                 Back to Login
               </a>
             </div>
           </form>
-        </div>
-      </div>
-
-      <!-- Security Info -->
-      <div class="mt-6 animate-fade-in" style="animation-delay: 0.3s;">
-        <div class="card bg-base-100/50 backdrop-blur-sm border border-base-300">
-          <div class="card-body p-4">
-            <div class="flex items-center gap-3">
-              <div class="bg-success/10 p-2 rounded-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-success" viewBox="0 0 20 20"
-                  fill="currentColor">
-                  <path fill-rule="evenodd"
-                    d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                    clip-rule="evenodd" />
-                </svg>
-              </div>
-              <div class="flex-1">
-                <h4 class="font-semibold text-sm">Secure 2FA Authentication</h4>
-                <p class="text-xs text-base-content/60">Your account is protected with two-factor authentication</p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>

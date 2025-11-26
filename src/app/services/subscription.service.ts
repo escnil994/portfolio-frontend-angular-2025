@@ -3,19 +3,10 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
-export interface SubscribeResponse {
-  message: string;
-  verified: boolean;
-}
+export interface SubscribeResponse { message: string; verified: boolean; }
+export interface VerifyResponse { message: string; verified: boolean; }
 
-export interface VerifyResponse {
-  message: string;
-  verified: boolean;
-}
-
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class SubscriptionService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/subscribes`;

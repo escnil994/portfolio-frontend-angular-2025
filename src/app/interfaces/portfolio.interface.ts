@@ -1,10 +1,4 @@
-export interface Image {
-  id: number;
-  entity_id: number;
-  entity_type: string;
-  image_url: string;
-  image_order: number;
-}
+import { ImageResponse } from './user.interface';
 
 export interface Video {
   id: number;
@@ -28,6 +22,14 @@ export interface Comment {
   blog_post_id: number | null;
 }
 
+export interface CommentCreate {
+  name: string;
+  email: string;
+  content: string;
+  project_id?: number;
+  blog_post_id?: number;
+}
+
 export interface Reaction {
   id: number;
   type: 'love';
@@ -46,39 +48,6 @@ export interface ReactionSummary {
   user_reaction: 'like' | 'love' | 'congratulations' | null;
 }
 
-export interface Skill {
-  id: number;
-  name: string;
-  icon: string;
-  color: string;
-  category: 'database' | 'cloud' | 'programming' | 'framework' | 'devops' | 'os' | 'tools' | 'iac' | 'runtime' | 'monitoring' | 'networking' | 'scripting';
-  proficiency: number;
-  yearsOfExperience: number;
-}
-
-export interface SkillsData {
-  skills: Skill[];
-}
-
-export interface Profile {
-  id: number;
-  name: string;
-  last_name: string;
-  display_name: string;
-  username: string;
-  title: string;
-  bio: string | null;
-  email: string;
-  github_url: string | null;
-  linkedin_url: string | null;
-  twitter_url: string | null;
-  profile_image_url: string | null;
-  skills: SkillsData | string | null;
-  resume_url: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
 export interface Project {
   id: number;
   title: string;
@@ -90,7 +59,7 @@ export interface Project {
   featured: boolean;
   created_at: string;
   updated_at: string;
-  images: Image[];
+  images: ImageResponse[];
 }
 
 export interface ProjectWithDetails extends Project {
@@ -98,7 +67,82 @@ export interface ProjectWithDetails extends Project {
   videos: Video[];
 }
 
+export interface ProjectFormData {
+  title: string;
+  description: string;
+  content?: string;
+  technologies: string;
+  slug: string;
+  tags?: string;
+  github_url?: string;
+  demo_url?: string;
+  featured: boolean;
+}
+export interface ProjectVideo {
+  id?: number;
+  url: string;
+  source: string;
+}
 
+export interface BlogPost {
+  id: number;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  author: Author;
+  tags: string | null;
+  image_url: string | null;
+  published: boolean;
+  views: number;
+  created_at: string;
+  updated_at: string;
+  images?: ImageResponse[];
+}
+
+export interface Author {
+  email: string;
+  full_name: string;
+  id: number;
+  is_active: boolean;
+  username: string;
+}
+
+
+export interface BlogPostWithDetails extends BlogPost {
+  comments: Comment[];
+  videos: Video[];
+  reactions?: Reaction[];
+}
+
+export interface BlogPostFormData {
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  tags?: string;
+  published: boolean;
+}
+
+export interface ContactMessage {
+  id: number;
+  name: string;
+  email: string;
+  subject?: string;
+  message: string;
+  read: boolean;
+  created_at: string;
+}
+
+export interface MessageResponse {
+  message: string;
+  detail?: string;
+}
+
+export interface MessageStats {
+  total_messages: number;
+  unread_count: number;
+}
 
 export interface ProjectUI {
   id: number;
@@ -109,6 +153,7 @@ export interface ProjectUI {
   featured: boolean;
   technologies: string[];
   githubUrl?: string;
+  content?: string;
   demoUrl?: string;
   videoUrl?: string;
   category?: string;
@@ -117,28 +162,7 @@ export interface ProjectUI {
   reactions?: ReactionSummary;
 }
 
-export interface BlogPost {
-  id: number;
-  title: string;
-  slug: string;
-  excerpt: string;
-  content: string;
-  author: string;
-  tags: string | null;
-  image_url: string | null;
-  published: boolean;
-  views: number;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface BlogPostWithDetails extends BlogPost {
-  comments: Comment[];
-  videos: Video[];
-  reactions?: Reaction[];
-}
-
-export interface BlogPostUI extends BlogPost {
+export interface BlogPostUI extends Omit<BlogPost, 'images'> {
   image: string;
   images?: string[];
   category: string;
@@ -150,66 +174,17 @@ export interface BlogPostUI extends BlogPost {
   comments: Comment[];
 }
 
-export interface CommentCreate {
+
+export interface Skill {
+  id: number | null;
   name: string;
-  email: string;
-  content: string;
-  project_id?: number;
-  blog_post_id?: number;
+  icon: string | null;
+  color: string | null;
+  category: string | null;
+  proficiency: number;
+  yearsOfExperience: number;
 }
 
-export interface ContactMessage {
-  name: string;
-  email: string;
-  subject?: string;
-  message: string;
-}
-
-export interface MessageResponse {
-  message: string;
-  detail?: string;
-}
-
-export interface ProjectFormData {
-  title: string;
-  description: string;
-  technologies: string;
-  tags?: string;
-  github_url?: string;
-  demo_url?: string;
-  featured: boolean;
-}
-
-export interface ProjectImage {
-  id?: number;
-  image_url: string;
-  image_order: number;
-}
-
-export interface ProjectVideo {
-  id?: number;
-  url: string;
-  source: string;
-}
-
-
-export interface PostFormData {
-  title: string;
-  description: string;
-  technologies: string;
-  tags?: string;
-  github_url?: string;
-  demo_url?: string;
-  featured: boolean;
-}
-
-
-export interface BlogPostFormData {
-  title: string;
-  slug: string;
-  excerpt: string;
-  content: string;
-  author: string;
-  tags?: string;
-  published: boolean;
+export interface SkillsData {
+  skills: Skill[];
 }
